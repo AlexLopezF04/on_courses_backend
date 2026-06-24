@@ -20,8 +20,8 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = '__all__'
 
-    def get_total(self, obj):
-        return sum(item.course.price for item in obj.items.all())
+    def get_total(self, obj) -> float:
+        return float(sum(item.course.price for item in obj.items.all()))
 
 
 class CartItemWriteSerializer(serializers.ModelSerializer):

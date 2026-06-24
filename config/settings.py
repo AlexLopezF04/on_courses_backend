@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'django_filters',
     'corsheaders',
+    'drf_spectacular',
 
     # Apps de on_courses (ordenadas por dominio)
     'apps.users',
@@ -139,7 +140,18 @@ REST_FRAMEWORK = {
         'rest_framework.filters.OrderingFilter',
     ),
     'DEFAULT_PAGINATION_CLASS': 'config.pagination.StandardPagination',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'PAGE_SIZE': 10,
+}
+
+# =============================================================================
+# DRF-SPECTACULAR — Documentación automática de la API
+# =============================================================================
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'OnCourses API',
+    'DESCRIPTION': 'API de plataforma de cursos online de tecnología',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 # =============================================================================
