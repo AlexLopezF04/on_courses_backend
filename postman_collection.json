@@ -1,0 +1,599 @@
+{
+  "info": {
+    "name": "OnCourses API",
+    "description": "API REST de plataforma de cursos online de tecnología\n\n## Autenticación\n1. Usa `POST /api/auth/register/` para crear un usuario\n2. Usa `POST /api/auth/login/` para obtener tokens\n3. La variable `auth_token` se asigna automáticamente via Tests en Login\n\n## Variables de entorno recomendadas\n- `base_url`: `http://localhost:8000` (local) o tu URL de producción\n- `auth_token`: se llena automáticamente",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Auth",
+      "description": "Autenticación JWT: registro, login, refresh",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/health/",
+            "description": "Verifica que el servidor esté operativo"
+          }
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/register/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"estudiante1\",\n  \"email\": \"estudiante1@test.com\",\n  \"password\": \"Pass1234!\",\n  \"password_confirm\": \"Pass1234!\",\n  \"first_name\": \"Carlos\",\n  \"last_name\": \"López\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/login/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"estudiante1\",\n  \"password\": \"Pass1234!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('auth_token', jsonData.access);",
+                  "pm.collectionVariables.set('refresh_token', jsonData.refresh);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/refresh/",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Usuarios",
+      "description": "CRUD de usuarios (admin para list, owner/admin para retrieve/update)",
+      "item": [
+        {
+          "name": "List Users (admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/users/",
+            "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}]
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/users/1/",
+            "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}]
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/api/users/1/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Carlos Updated\",\n  \"phone\": \"0999999999\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Cursos",
+      "description": "Categorías, cursos, módulos, lecciones y recursos",
+      "item": [
+        {
+          "name": "Categories",
+          "item": [
+            {
+              "name": "List Categories",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/categories/"
+              }
+            },
+            {
+              "name": "Create Category (admin)",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/categories/",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Backend\",\n  \"description\": \"Cursos de desarrollo backend\",\n  \"slug\": \"backend\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Delete Category (admin)",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/categories/1/",
+                "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Courses",
+          "item": [
+            {
+              "name": "List Courses",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/courses/"
+              }
+            },
+            {
+              "name": "Search Courses",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/courses/?search=django"
+              }
+            },
+            {
+              "name": "Filter by Price",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/courses/?min_price=10&max_price=100"
+              }
+            },
+            {
+              "name": "Create Course (professor)",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/courses/",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"category\": 1,\n  \"title\": \"Django REST Framework\",\n  \"description\": \"Aprende DRF desde cero\",\n  \"price\": \"49.99\",\n  \"slug\": \"django-rest-framework\",\n  \"is_active\": true\n}"
+                }
+              }
+            },
+            {
+              "name": "Update Course",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/courses/1/",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"price\": \"39.99\"\n}"
+                }
+              }
+            },
+            {
+              "name": "Upload Course Cover",
+              "request": {
+                "method": "PATCH",
+                "url": "{{base_url}}/api/courses/1/",
+                "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {"key": "cover_image", "type": "file", "src": "/path/to/image.png"}
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Course (admin)",
+              "request": {
+                "method": "DELETE",
+                "url": "{{base_url}}/api/courses/1/",
+                "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Modules",
+          "item": [
+            {
+              "name": "Create Module",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/modules/",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"course\": 1,\n  \"title\": \"Introducción\",\n  \"description\": \"Primeros pasos\",\n  \"order\": 1\n}"
+                }
+              }
+            },
+            {
+              "name": "List Modules",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/modules/"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lessons",
+          "item": [
+            {
+              "name": "Create Lesson",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/lessons/",
+                "header": [
+                  {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+                  {"key": "Content-Type", "value": "application/json"}
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"module\": 1,\n  \"title\": \"Instalación de Django\",\n  \"content_text\": \"En esta lección veremos cómo instalar Django...\",\n  \"video_url\": \"https://youtube.com/watch?v=xxx\",\n  \"duration_seconds\": 600,\n  \"order\": 1\n}"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Resources",
+          "item": [
+            {
+              "name": "Upload Resource File",
+              "request": {
+                "method": "POST",
+                "url": "{{base_url}}/api/resources/",
+                "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {"key": "lesson", "value": "1"},
+                    {"key": "title", "value": "Guía PDF"},
+                    {"key": "file", "type": "file", "src": "/path/to/file.pdf"},
+                    {"key": "resource_type", "value": "pdf"}
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Comunidad",
+      "description": "Foros, anuncios y comentarios",
+      "item": [
+        {
+          "name": "Create Forum Thread",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/forum-threads/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1,\n  \"title\": \"Duda sobre serializers\",\n  \"content\": \"Alguien me explica cómo funcionan los serializers anidados?\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Reply to Thread (ForumPost)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/forum-posts/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"thread\": 1,\n  \"content\": \"Claro, los serializers transforman objetos Python a JSON...\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Announcement",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/announcements/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1,\n  \"title\": \"Nueva lección disponible\",\n  \"content\": \"Se ha agregado la lección sobre DRF serializers\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Comment on Lesson",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/lesson-comments/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lesson\": 1,\n  \"content\": \"Excelente explicación!\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Progreso",
+      "description": "Inscripciones, progreso, exámenes y certificados",
+      "item": [
+        {
+          "name": "Enroll in Course",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/enrollments/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Lesson Progress",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/lesson-progress/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lesson\": 1,\n  \"percentage\": 50,\n  \"last_video_position\": 300\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Exam Attempt",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/exam-attempts/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"exam\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit Exam Answers",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/exam-attempts/1/submit/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\"question\": 1, \"selected_option\": 2},\n    {\"question\": 2, \"selected_option\": 5}\n  ]\n}"
+            }
+          }
+        },
+        {
+          "name": "List My Certificates",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/certificates/",
+            "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}]
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Gamificación",
+      "description": "Logros y reseñas",
+      "item": [
+        {
+          "name": "List Achievements",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/achievements/"
+          }
+        },
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/reviews/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1,\n  \"rating\": 5,\n  \"comment\": \"Excelente curso, muy completo\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Comercial",
+      "description": "Carrito, cupones, órdenes y soporte",
+      "item": [
+        {
+          "name": "Get My Cart",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/carts/mine/",
+            "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}]
+          }
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/cart-items/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"course\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Validate Coupon",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/coupons/validate/?code=DESCUENTO10",
+            "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}]
+          }
+        },
+        {
+          "name": "Create Order (from Cart)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/orders/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"coupon\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "Pay Order",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/orders/1/pay/",
+            "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}]
+          }
+        },
+        {
+          "name": "Create Support Ticket",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/support-tickets/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Problema con el pago\",\n  \"description\": \"Realicé el pago pero no se actualiza mi orden\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Add Message to Ticket",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/support-tickets/1/add_message/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Ya resolví el problema, gracias\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. API Docs",
+      "description": "Documentación automática",
+      "item": [
+        {
+          "name": "Swagger UI",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/docs/"
+          }
+        },
+        {
+          "name": "ReDoc",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/redoc/"
+          }
+        },
+        {
+          "name": "Schema (JSON)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/schema/"
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refresh_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
