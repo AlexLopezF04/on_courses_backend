@@ -1,6 +1,22 @@
-from django.urls import path
-from apps.users.views import health_check
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView, TokenRefreshView
+)
+from apps.users.views import health_check, RegisterView, UserViewSet
+
+router = DefaultRouter()
+router.register(r'users', UserViewSet)
 
 urlpatterns = [
+    # Health check
     path('health/', health_check),
+
+    # Autenticación JWT
+    path('auth/register/', RegisterView.as_view()),
+    path('auth/login/', TokenObtainPairView.as_view()),
+    path('auth/refresh/', TokenRefreshView.as_view()),
+
+    # CRUD de usuarios (vía router)
+    path('', include(router.urls)),
 ]
