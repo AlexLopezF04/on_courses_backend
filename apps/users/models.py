@@ -50,7 +50,12 @@ class StudentProfile(models.Model):
     biography = models.TextField(blank=True, verbose_name='Biografía')
     country = models.CharField(max_length=100, blank=True, verbose_name='País')
     birth_date = models.DateField(null=True, blank=True, verbose_name='Fecha de nacimiento')
-    avatar_url = models.URLField(blank=True, verbose_name='URL del avatar')
+    avatar = models.ImageField(
+        upload_to='avatars/',
+        blank=True,
+        null=True,
+        verbose_name='Avatar'
+    )
 
     class Meta:
         db_table = 'perfiles_estudiante'

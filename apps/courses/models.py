@@ -39,7 +39,12 @@ class Course(models.Model):
         default=0,
         verbose_name='Precio'
     )
-    cover_image = models.URLField(blank=True, verbose_name='Imagen de portada')
+    cover_image = models.ImageField(
+        upload_to='courses/covers/',
+        blank=True,
+        null=True,
+        verbose_name='Imagen de portada'
+    )
     slug = models.SlugField(max_length=280, unique=True, verbose_name='Slug')
     is_active = models.BooleanField(default=True, verbose_name='Activo')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Fecha de creación')
@@ -125,7 +130,12 @@ class Resource(models.Model):
         verbose_name='Lección'
     )
     title = models.CharField(max_length=255, verbose_name='Título')
-    file_url = models.URLField(verbose_name='URL del archivo')
+    file = models.FileField(
+        upload_to='resources/',
+        blank=True,
+        null=True,
+        verbose_name='Archivo'
+    )
     resource_type = models.CharField(
         max_length=20,
         choices=Type.choices,

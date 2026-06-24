@@ -7,7 +7,12 @@ class Achievement(models.Model):
     """Definición de un logro que los estudiantes pueden desbloquear."""
     name = models.CharField(max_length=200, unique=True, verbose_name='Nombre')
     description = models.TextField(blank=True, verbose_name='Descripción')
-    icon_url = models.URLField(blank=True, verbose_name='URL del ícono')
+    icon = models.ImageField(
+        upload_to='achievements/',
+        blank=True,
+        null=True,
+        verbose_name='Ícono'
+    )
     criteria = models.CharField(
         max_length=255,
         blank=True,
