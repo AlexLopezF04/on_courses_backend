@@ -9,6 +9,7 @@ from apps.users.serializers import (
 )
 from apps.users.filters import UserFilter
 from apps.users.permissions import IsOwnerOrAdmin, IsAdminUser
+from apps.email_helper import send_welcome_email
 
 
 @api_view(['GET'])
@@ -28,6 +29,7 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        send_welcome_email(user)
         return Response(
             UserSerializer(user).data,
             status=status.HTTP_201_CREATED

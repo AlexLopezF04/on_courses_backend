@@ -1,0 +1,360 @@
+// =============================================================================
+// on_courses — Diagrama Entidad-Relación (dbdiagram.io DSL)
+// 32 tablas | 6 módulos | Plataforma de cursos online de tecnología
+// =============================================================================
+
+// =============================================================================
+// MÓDULO 1 — USUARIOS (usuarios)
+// =============================================================================
+
+Table usuarios {
+  id bigint PK
+  password varchar(128)
+  last_login datetime
+  is_superuser boolean
+  username varchar(150) [unique]
+  first_name varchar(150)
+  last_name varchar(150)
+  email varchar(254)
+  is_staff boolean
+  is_active boolean
+  date_joined datetime
+  role varchar(20) [note: 'student | professor | admin']
+  phone varchar(20)
+}
+
+Table perfiles_estudiante {
+  id bigint PK
+  user_id bigint [not null, unique, ref: > usuarios.id]
+  biography text
+  country varchar(100)
+  birth_date date
+  avatar varchar(100) [note: 'ImageField']
+}
+
+Table perfiles_profesor {
+  id bigint PK
+  user_id bigint [not null, unique, ref: > usuarios.id]
+  professional_title varchar(200)
+  specialty varchar(200)
+  biography text
+  linkedin_url varchar(200)
+}
+
+Table sesiones_acceso {
+  id bigint PK
+  user_id bigint [not null, ref: > usuarios.id]
+  ip_address varchar(39)
+  user_agent text
+  login_time datetime
+  logout_time datetime
+}
+
+// =============================================================================
+// MÓDULO 2 — CURSOS (cursos)
+// =============================================================================
+
+Table categorias {
+  id bigint PK
+  name varchar(100) [unique]
+  description text
+  slug varchar(120) [unique]
+}
+
+Table cursos {
+  id bigint PK
+  category_id bigint [not null, ref: > categorias.id]
+  professor_id bigint [not null, ref: > usuarios.id]
+  title varchar(255)
+  description text
+  price decimal(10,2) [default: 0]
+  cover_image varchar(100) [note: 'ImageField']
+  slug varchar(280) [unique]
+  is_active boolean [default: true]
+  created_at datetime
+}
+
+Table modulos {
+  id bigint PK
+  course_id bigint [not null, ref: > cursos.id]
+  title varchar(255)
+  description text
+  order_ int [note: 'PositiveIntegerField - orden']
+  indexes {
+    (course_id, order_) [unique]
+  }
+}
+
+Table lecciones {
+  id bigint PK
+  module_id bigint [not null, ref: > modulos.id]
+  title varchar(255)
+  content_text text
+  video_url varchar(200)
+  duration_seconds int [default: 0]
+  order_ int
+  completion_percentage int [default: 90]
+  indexes {
+    (module_id, order_) [unique]
+  }
+}
+
+Table recursos {
+  id bigint PK
+  lesson_id bigint [not null, ref: > lecciones.id]
+  title varchar(255)
+  file varchar(100) [note: 'FileField']
+  resource_type varchar(20) [note: 'pdf | video | code | link | other']
+}
+
+// =============================================================================
+// MÓDULO 3 — COMUNIDAD (foros, anuncios, comentarios)
+// =============================================================================
+
+Table foros_temas {
+  id bigint PK
+  course_id bigint [not null, ref: > cursos.id]
+  author_id bigint [not null, ref: > usuarios.id]
+  title varchar(255)
+  content text
+  created_at datetime
+}
+
+Table foros_mensajes {
+  id bigint PK
+  thread_id bigint [not null, ref: > foros_temas.id]
+  author_id bigint [not null, ref: > usuarios.id]
+  content text
+  created_at datetime
+}
+
+Table anuncios {
+  id bigint PK
+  course_id bigint [not null, ref: > cursos.id]
+  author_id bigint [not null, ref: > usuarios.id]
+  title varchar(255)
+  content text
+  created_at datetime
+}
+
+Table comentarios_lecciones {
+  id bigint PK
+  lesson_id bigint [not null, ref: > lecciones.id]
+  author_id bigint [not null, ref: > usuarios.id]
+  parent_id bigint [ref: > comentarios_lecciones.id, note: 'auto-referencia para respuestas anidadas']
+  content text
+  created_at datetime
+}
+
+// =============================================================================
+// MÓDULO 4 — PROGRESO Y EVALUACIONES (progreso, evaluaciones)
+// =============================================================================
+
+Table inscripciones {
+  id bigint PK
+  user_id bigint [not null, ref: > usuarios.id]
+  course_id bigint [not null, ref: > cursos.id]
+  enrolled_at datetime
+  is_active boolean [default: true]
+  total_progress decimal(5,2) [default: 0]
+  indexes {
+    (user_id, course_id) [unique]
+  }
+}
+
+Table progreso_lecciones {
+  id bigint PK
+  user_id bigint [not null, ref: > usuarios.id]
+  lesson_id bigint [not null, ref: > lecciones.id]
+  is_completed boolean [default: false]
+  percentage int [default: 0]
+  last_video_position int [default: 0]
+  updated_at datetime
+  indexes {
+    (user_id, lesson_id) [unique]
+  }
+}
+
+Table banco_preguntas {
+  id bigint PK
+  course_id bigint [not null, ref: > cursos.id]
+  author_id bigint [not null, ref: > usuarios.id]
+  question_text text
+  question_type varchar(20) [note: 'multiple | true_false | single']
+}
+
+Table opciones_pregunta {
+  id bigint PK
+  question_id bigint [not null, ref: > banco_preguntas.id]
+  option_text varchar(255)
+  is_correct boolean [default: false]
+}
+
+Table evaluaciones {
+  id bigint PK
+  course_id bigint [not null, ref: > cursos.id]
+  module_id bigint [ref: > modulos.id, note: 'opcional']
+  title varchar(255)
+  description text
+  max_attempts int [default: 3]
+  min_score int [default: 80]
+  start_date datetime
+  end_date datetime
+}
+
+Table preguntas_evaluacion {
+  id bigint PK
+  exam_id bigint [not null, ref: > evaluaciones.id]
+  question_id bigint [not null, ref: > banco_preguntas.id]
+  score int [default: 10]
+  indexes {
+    (exam_id, question_id) [unique]
+  }
+}
+
+Table intentos_evaluacion {
+  id bigint PK
+  exam_id bigint [not null, ref: > evaluaciones.id]
+  user_id bigint [not null, ref: > usuarios.id]
+  start_time datetime
+  end_time datetime
+  score decimal(5,2)
+  is_passed boolean [default: false]
+}
+
+Table respuestas_intentos {
+  id bigint PK
+  attempt_id bigint [not null, ref: > intentos_evaluacion.id]
+  question_id bigint [not null, ref: > banco_preguntas.id]
+  selected_option_id bigint [not null, ref: > opciones_pregunta.id]
+  is_correct boolean [default: false]
+}
+
+Table certificados {
+  id bigint PK
+  user_id bigint [not null, ref: > usuarios.id]
+  course_id bigint [not null, ref: > cursos.id]
+  verification_code varchar(36) [unique]
+  issued_at datetime
+  indexes {
+    (user_id, course_id) [unique]
+  }
+}
+
+// =============================================================================
+// MÓDULO 5 — GAMIFICACIÓN (logros, reseñas)
+// =============================================================================
+
+Table logros {
+  id bigint PK
+  name varchar(200) [unique]
+  description text
+  icon varchar(100) [note: 'ImageField']
+  criteria varchar(255)
+}
+
+Table logros_usuarios {
+  id bigint PK
+  user_id bigint [not null, ref: > usuarios.id]
+  achievement_id bigint [not null, ref: > logros.id]
+  earned_at datetime
+  indexes {
+    (user_id, achievement_id) [unique]
+  }
+}
+
+Table resenas {
+  id bigint PK
+  user_id bigint [not null, ref: > usuarios.id]
+  course_id bigint [not null, ref: > cursos.id]
+  rating int [note: '1-5']
+  comment text
+  created_at datetime
+  indexes {
+    (user_id, course_id) [unique]
+  }
+}
+
+// =============================================================================
+// MÓDULO 6 — COMERCIAL (carritos, cupones, órdenes, soporte)
+// =============================================================================
+
+Table carritos {
+  id bigint PK
+  user_id bigint [not null, unique, ref: > usuarios.id]
+  created_at datetime
+}
+
+Table carritos_items {
+  id bigint PK
+  cart_id bigint [not null, ref: > carritos.id]
+  course_id bigint [not null, ref: > cursos.id]
+  added_at datetime
+  indexes {
+    (cart_id, course_id) [unique]
+  }
+}
+
+Table cupones {
+  id bigint PK
+  code varchar(50) [unique]
+  description text
+  discount_type varchar(20) [note: 'percentage | fixed']
+  discount_value decimal(10,2)
+  max_uses int [default: 100]
+  current_uses int [default: 0]
+  is_active boolean [default: true]
+  expires_at datetime
+  created_at datetime
+}
+
+Table ordenes {
+  id bigint PK
+  user_id bigint [not null, ref: > usuarios.id]
+  coupon_id bigint [ref: > cupones.id, note: 'opcional']
+  total decimal(10,2)
+  status varchar(20) [note: 'pending | paid | cancelled | refunded']
+  created_at datetime
+  paid_at datetime
+}
+
+Table ordenes_items {
+  id bigint PK
+  order_id bigint [not null, ref: > ordenes.id]
+  course_id bigint [not null, ref: > cursos.id]
+  unit_price decimal(10,2)
+  indexes {
+    (order_id, course_id) [unique]
+  }
+}
+
+Table tickets_soporte {
+  id bigint PK
+  user_id bigint [not null, ref: > usuarios.id]
+  subject varchar(255)
+  description text
+  status varchar(20) [note: 'open | in_progress | resolved | closed']
+  created_at datetime
+  updated_at datetime
+}
+
+Table mensajes_soporte {
+  id bigint PK
+  ticket_id bigint [not null, ref: > tickets_soporte.id]
+  sender_id bigint [not null, ref: > usuarios.id]
+  message text
+  sent_at datetime
+}
+
+// =============================================================================
+// NOTAS DEL DISEÑO
+// =============================================================================
+// Módulo 1 (Usuarios):    4 tablas — User, StudentProfile, ProfessorProfile, AccessLog
+// Módulo 2 (Cursos):      5 tablas — Category, Course, Module, Lesson, Resource
+// Módulo 3 (Comunidad):   4 tablas — ForumThread, ForumPost, Announcement, LessonComment
+// Módulo 4 (Progreso):    9 tablas — Enrollment, LessonProgress, QuestionBank, QuestionOption,
+//                                    Exam, ExamQuestion, ExamAttempt, AttemptAnswer, Certificate
+// Módulo 5 (Gamificación):3 tablas — Achievement, UserAchievement, Review
+// Módulo 6 (Comercial):   7 tablas — Cart, CartItem, Coupon, Order, OrderItem,
+//                                    SupportTicket, SupportMessage
+// Total: 32 tablas
