@@ -1,0 +1,79 @@
+from rest_framework import serializers
+from apps.community.models import ForumThread, ForumPost, Announcement, LessonComment
+
+
+class ForumPostSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author.get_full_name', read_only=True)
+
+    class Meta:
+        model = ForumPost
+        fields = '__all__'
+
+
+class ForumThreadSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author.get_full_name', read_only=True)
+    posts_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ForumThread
+        fields = '__all__'
+
+    def get_posts_count(self, obj):
+        return obj.posts.count()
+
+
+class ForumThreadDetailSerializer(serializers.ModelSerializer):
+    """Serializer detallado que incluye los mensajes del hilo."""
+    author_name = serializers.CharField(source='author.get_full_name', read_only=True)
+    posts = ForumPostSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ForumThread
+        fields = '__all__'
+
+
+class ForumThreadWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ForumThread
+        fields = ['course', 'title', 'content']
+
+
+class ForumPostWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ForumPost
+        fields = ['thread', 'content']
+
+
+class AnnouncementSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author.get_full_name', read_only=True)
+
+    class Meta:
+        model = Announcement
+        fields = '__all__'
+
+
+class AnnouncementWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Announcement
+        fields = ['course', 'title', 'content']
+
+
+class LessonCommentSerializer(serializers.ModelSerializer):
+    """Serializer para comentarios con respuestas anidadas."""
+    author_name = serializers.CharField(source='author.get_full_name', read_only=True)
+    replies = serializers.SerializerMethodField()
+
+    class Meta:
+        model = LessonComment
+        fields = '__all__'
+
+    def get_replies(self, obj):
+        if obj.replies.exists():
+            return LessonCommentSerializer(obj.replies.all(), many=True).data
+        return []
+
+
+class LessonCommentWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LessonComment
+        fields = ['lesson', 'parent', 'content']
