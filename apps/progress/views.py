@@ -25,6 +25,7 @@ from apps.progress.filters import (
 )
 from apps.progress.permissions import IsEnrolledOrAdmin, IsProfessorOfCourse
 from apps.users.permissions import IsAdminUser, IsProfessorOrAdmin
+from apps.email_helper import send_enrollment_email
 
 
 class EnrollmentViewSet(viewsets.ModelViewSet):
@@ -45,8 +46,13 @@ class EnrollmentViewSet(viewsets.ModelViewSet):
             return [IsAuthenticated(), IsEnrolledOrAdmin()]
         return [IsAuthenticated()]
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        enrollment = serializer.save(user=self.request.user)
+        send_enrollment_email(self.request.user, enrollment.course)
+        read_serializer = EnrollmentSerializer(enrollment)
+        return Response(read_serializer.data, status=status.HTTP_201_CREATED)
 
 
 class LessonProgressViewSet(viewsets.ModelViewSet):

@@ -113,11 +113,13 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Order.objects.all()
         return Order.objects.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        user = self.request.user
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
         coupon = serializer.validated_data.get('coupon')
 
-        # Obtiene items del carrito
         cart, _ = Cart.objects.get_or_create(user=user)
         cart_items = cart.items.all()
 
@@ -127,10 +129,8 @@ class OrderViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Calcula el total
         total = sum(item.course.price for item in cart_items)
 
-        # Aplica descuento si hay cupón
         if coupon:
             if coupon.discount_type == 'percentage':
                 total -= total * (coupon.discount_value / Decimal(100))
@@ -141,7 +141,6 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         order = serializer.save(user=user, total=max(total, 0))
 
-        # Crea los items de la orden
         for cart_item in cart_items:
             OrderItem.objects.create(
                 order=order,
@@ -149,8 +148,9 @@ class OrderViewSet(viewsets.ModelViewSet):
                 unit_price=cart_item.course.price
             )
 
-        # Vacía el carrito
         cart_items.delete()
+
+        return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['post'])
     def pay(self, request, pk=None):

@@ -19,6 +19,12 @@ class EnrollmentWriteSerializer(serializers.ModelSerializer):
         model = Enrollment
         fields = ['course']
 
+    def validate_course(self, value):
+        user = self.context['request'].user
+        if Enrollment.objects.filter(user=user, course=value).exists():
+            raise serializers.ValidationError('Ya estás inscrito en este curso')
+        return value
+
 
 class LessonProgressSerializer(serializers.ModelSerializer):
     lesson_title = serializers.CharField(source='lesson.title', read_only=True)
