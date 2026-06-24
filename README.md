@@ -1,1 +1,493 @@
-# on_courses_backend
+<div align="center">
+
+# 🎓 OnCourses API
+
+**Plataforma de Cursos Online de Tecnología — Backend**
+
+![Django](https://img.shields.io/badge/Django-5.2-092E20?style=for-the-badge&logo=django&logoColor=white)
+![DRF](https://img.shields.io/badge/DRF-3.16-A30000?style=for-the-badge&logo=django&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+
+![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
+![Swagger](https://img.shields.io/badge/Swagger-Docs-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
+![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-FF6B6B?style=for-the-badge)
+
+---
+
+</div>
+
+## 📋 Tabla de Contenidos
+
+- [Información General](#-información-general)
+- [Arquitectura](#-arquitectura)
+- [Modelo de Datos](#-modelo-de-datos)
+- [Instalación Local](#-instalación-local)
+- [Uso de la API](#-uso-de-la-api)
+- [Endpoints](#-endpoints)
+- [Despliegue en Producción](#-despliegue-en-producción)
+- [Tecnologías](#-tecnologías)
+- [Autores](#-autores)
+
+---
+
+## 📖 Información General
+
+**OnCourses** es una plataforma de cursos online enfocada en tecnología. Este repositorio contiene el **backend** completo desarrollado con Django y Django REST Framework, diseñado para ser consumido por aplicaciones web (React/Next.js) y móviles (Flutter/React Native).
+
+### 👥 Integrantes
+
+| Integrante | Rol |
+|---|---|
+| *Tu nombre aquí* | Backend Developer |
+| *Compañero 1* | Frontend Developer |
+| *Compañero 2* | Mobile Developer |
+
+### ✨ Funcionalidades Principales
+
+| Módulo | Descripción |
+|---|---|
+| 👤 **Usuarios y Auth** | Registro, login JWT, 3 roles (estudiante, profesor, admin), perfiles |
+| 📚 **Cursos** | Categorías, cursos, módulos, lecciones, recursos descargables |
+| 💬 **Comunidad** | Foros por curso, anuncios, comentarios con respuestas anidadas |
+| 📈 **Progreso** | Inscripciones, avance por lección, banco de preguntas, exámenes, certificados |
+| 🏆 **Gamificación** | Logros, reseñas y calificaciones de cursos |
+| 🛒 **Comercial** | Carrito de compras, cupones de descuento, órdenes, tickets de soporte |
+
+---
+
+## 🏗 Arquitectura
+
+El proyecto sigue una **arquitectura modular** basada en 6 aplicaciones Django independientes:
+
+```
+on_courses_backend/
+├── config/                  # Configuración central
+│   ├── settings.py          # Base de datos, JWT, DRF, CORS, Email
+│   ├── urls.py              # Enrutador principal
+│   ├── wsgi.py              # Entry point para Gunicorn
+│   └── pagination.py        # Paginación personalizada
+├── apps/
+│   ├── users/               # Módulo 1: Usuarios (4 tablas)
+│   ├── courses/             # Módulo 2: Cursos (5 tablas)
+│   ├── community/           # Módulo 3: Comunidad (4 tablas)
+│   ├── progress/            # Módulo 4: Progreso (9 tablas)
+│   ├── gamification/        # Módulo 5: Gamificación (3 tablas)
+│   └── commercial/          # Módulo 6: Comercial (7 tablas)
+├── .env                     # Variables de entorno
+├── manage.py                # CLI de Django
+└── pyproject.toml           # Dependencias (uv)
+```
+
+---
+
+## 🗄 Modelo de Datos
+
+**32 tablas** distribuidas en 6 módulos, más 11 tablas del framework Django = **43 tablas en PostgreSQL**.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    DIAGRAMA ENTIDAD-RELACIÓN                 │
+│                                                             │
+│  Usuarios ──┐                                               │
+│    │        ├── Cursos ── Módulos ── Lecciones ── Recursos  │
+│    │        │       │                                       │
+│    │        │       ├── Foros ── Mensajes                   │
+│    │        │       ├── Anuncios                            │
+│    │        │       └── Comentarios                         │
+│    │        │                                               │
+│    ├── Inscripciones ── Progreso_lecciones                  │
+│    │       └── Exámenes ── Intentos ── Certificados         │
+│    │                                                         │
+│    ├── Logros_usuarios ── Logros                            │
+│    ├── Reseñas                                              │
+│    ├── Carrito ── Items                                     │
+│    ├── Órdenes ── Items                                     │
+│    └── Tickets ── Mensajes                                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+> 💡 **Nota:** En [`dbdiagram.txt`](dbdiagram.txt) encontrarás el script completo para visualizar el diagrama en [dbdiagram.io](https://dbdiagram.io).
+
+---
+
+## 🚀 Instalación Local
+
+### Prerrequisitos
+
+- Python 3.13+
+- [uv](https://docs.astral.sh/uv/) (gestor de paquetes)
+- PostgreSQL 16+
+
+### Pasos
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/AlexLopezF04/on_courses_backend.git
+cd on_courses_backend
+
+# 2. Crear la base de datos en PostgreSQL
+psql -U postgres
+CREATE DATABASE on_courses_db;
+CREATE USER on_courses_user WITH PASSWORD 'on_courses_pass';
+ALTER ROLE on_courses_user SET client_encoding TO 'utf8';
+ALTER ROLE on_courses_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE on_courses_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE on_courses_db TO on_courses_user;
+ALTER USER on_courses_user CREATEDB;
+\q
+
+# 3. Configurar variables de entorno
+cp .env.example .env
+# Editar .env con tus credenciales de base de datos
+
+# 4. Instalar dependencias
+uv sync
+
+# 5. Ejecutar migraciones
+uv run python manage.py migrate
+
+# 6. Crear superusuario
+uv run python manage.py createsuperuser
+
+# 7. Iniciar servidor de desarrollo
+uv run python manage.py runserver
+```
+
+### Variables de Entorno
+
+```env
+# Django
+SECRET_KEY=tu-secret-key-aqui
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# PostgreSQL
+DB_NAME=on_courses_db
+DB_USER=on_courses_user
+DB_PASSWORD=on_courses_pass
+DB_HOST=localhost
+DB_PORT=5432
+
+# CORS
+CORS_ALLOW_ALL_ORIGINS=True
+
+# Email (opcional en desarrollo)
+EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
+```
+
+### Ejecutar Tests
+
+```bash
+# Todos los tests
+uv run python manage.py test
+
+# Tests por módulo
+uv run python manage.py test apps.users.tests
+uv run python manage.py test apps.courses.tests
+uv run python manage.py test apps.progress.tests
+```
+
+---
+
+## 📡 Uso de la API
+
+### Obtener Token JWT
+
+```bash
+# 1. Registrar un usuario
+curl -X POST http://localhost:8000/api/auth/register/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "estudiante1",
+    "email": "estudiante1@test.com",
+    "password": "Pass1234!",
+    "password_confirm": "Pass1234!"
+  }'
+
+# 2. Iniciar sesión (obtener token)
+curl -X POST http://localhost:8000/api/auth/login/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "estudiante1",
+    "password": "Pass1234!"
+  }'
+
+# Respuesta:
+{
+  "access": "eyJhbGciOiJIUzI1NiIs...",
+  "refresh": "eyJhbGciOiJIUzI1NiIs..."
+}
+```
+
+### Usar Endpoints Protegidos
+
+```bash
+# Incluir el token en el header Authorization
+curl http://localhost:8000/api/users/1/ \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIs..."
+```
+
+### Ejemplos de Peticiones
+
+```bash
+# Listar cursos (público)
+curl http://localhost:8000/api/courses/
+
+# Buscar cursos por título
+curl "http://localhost:8000/api/courses/?search=django"
+
+# Filtrar por precio
+curl "http://localhost:8000/api/courses/?min_price=10&max_price=100"
+
+# Paginación
+curl "http://localhost:8000/api/courses/?page=2"
+
+# Crear curso (requiere profesor/admin)
+curl -X POST http://localhost:8000/api/courses/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{
+    "category": 1,
+    "title": "Django REST Framework",
+    "slug": "django-rest-framework",
+    "price": "49.99"
+  }'
+
+# Inscribirse a un curso
+curl -X POST http://localhost:8000/api/enrollments/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{"course": 1}'
+
+# Agregar ítem al carrito
+curl -X POST http://localhost:8000/api/cart-items/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <token>" \
+  -d '{"course": 1}'
+```
+
+---
+
+## 📍 Endpoints
+
+### Autenticación
+
+| Método | Ruta | Permiso | Descripción |
+|---|---|---|---|
+| `GET` | `/api/health/` | Público | Verificar servidor |
+| `POST` | `/api/auth/register/` | Público | Registrar usuario |
+| `POST` | `/api/auth/login/` | Público | Iniciar sesión (JWT) |
+| `POST` | `/api/auth/refresh/` | Público | Refrescar token |
+
+### Usuarios
+
+| Método | Ruta | Permiso | Descripción |
+|---|---|---|---|
+| `GET` | `/api/users/` | Admin | Listar usuarios |
+| `GET` | `/api/users/{id}/` | Owner/Admin | Ver perfil |
+| `PATCH` | `/api/users/{id}/` | Owner/Admin | Actualizar perfil |
+| `DELETE` | `/api/users/{id}/` | Admin | Eliminar usuario |
+
+### Cursos
+
+| Método | Ruta | Permiso | Descripción |
+|---|---|---|---|
+| `GET` | `/api/categories/` | Público | Listar categorías |
+| `POST` | `/api/categories/` | Admin | Crear categoría |
+| `GET` | `/api/courses/` | Público | Listar cursos |
+| `POST` | `/api/courses/` | Profesor/Admin | Crear curso |
+| `PATCH` | `/api/courses/{id}/` | Owner/Admin | Actualizar curso |
+| `DELETE` | `/api/courses/{id}/` | Admin | Eliminar curso |
+| `POST` | `/api/modules/` | Profesor/Admin | Crear módulo |
+| `POST` | `/api/lessons/` | Profesor/Admin | Crear lección |
+| `POST` | `/api/resources/` | Profesor/Admin | Subir recurso |
+
+### Comunidad
+
+| Método | Ruta | Permiso | Descripción |
+|---|---|---|---|
+| `GET` | `/api/forum-threads/` | Público | Listar hilos |
+| `POST` | `/api/forum-threads/` | Autenticado | Crear hilo |
+| `POST` | `/api/forum-posts/` | Autenticado | Responder hilo |
+| `GET` | `/api/announcements/` | Autenticado | Ver anuncios |
+| `POST` | `/api/announcements/` | Profesor/Admin | Crear anuncio |
+| `POST` | `/api/lesson-comments/` | Autenticado | Comentar lección |
+
+### Progreso
+
+| Método | Ruta | Permiso | Descripción |
+|---|---|---|---|
+| `POST` | `/api/enrollments/` | Autenticado | Inscribirse a curso |
+| `POST` | `/api/lesson-progress/` | Autenticado | Actualizar progreso |
+| `POST` | `/api/exam-attempts/` | Autenticado | Iniciar intento |
+| `POST` | `/api/exam-attempts/{id}/submit/` | Autenticado | Entregar respuestas |
+| `GET` | `/api/certificates/` | Admin | Listar certificados |
+
+### Gamificación
+
+| Método | Ruta | Permiso | Descripción |
+|---|---|---|---|
+| `GET` | `/api/achievements/` | Público | Listar logros |
+| `POST` | `/api/achievements/` | Admin | Crear logro |
+| `POST` | `/api/reviews/` | Autenticado | Calificar curso |
+
+### Comercial
+
+| Método | Ruta | Permiso | Descripción |
+|---|---|---|---|
+| `GET` | `/api/carts/mine/` | Autenticado | Ver mi carrito |
+| `POST` | `/api/cart-items/` | Autenticado | Agregar curso |
+| `GET` | `/api/coupons/validate/?code=X` | Público | Validar cupón |
+| `POST` | `/api/orders/` | Autenticado | Crear orden |
+| `POST` | `/api/orders/{id}/pay/` | Autenticado | Pagar orden |
+| `POST` | `/api/support-tickets/` | Autenticado | Abrir ticket |
+| `POST` | `/api/support-tickets/{id}/add_message/` | Autenticado | Responder ticket |
+
+### Documentación
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| `GET` | `/api/docs/` | Swagger UI (interactivo) |
+| `GET` | `/api/redoc/` | ReDoc (lectura) |
+| `GET` | `/api/schema/` | Schema OpenAPI (JSON) |
+
+---
+
+## ☁ Despliegue en Producción
+
+### Configuración del VPS (Ubuntu 22.04+)
+
+```bash
+# Actualizar sistema
+sudo apt update && sudo apt upgrade -y
+
+# Instalar dependencias del sistema
+sudo apt install -y python3.13 python3.13-venv nginx postgresql postgresql-contrib
+
+# Instalar uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Configuración de PostgreSQL
+
+```bash
+# Acceder a PostgreSQL
+sudo -u postgres psql
+
+# Crear base de datos y usuario
+CREATE DATABASE on_courses_db;
+CREATE USER on_courses_user WITH PASSWORD 'password_seguro';
+GRANT ALL PRIVILEGES ON DATABASE on_courses_db TO on_courses_user;
+ALTER USER on_courses_user CREATEDB;
+\q
+```
+
+### Configuración de Gunicorn
+
+Crear archivo `/etc/systemd/system/oncourses.service`:
+
+```ini
+[Unit]
+Description=OnCourses API - Gunicorn
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/on_courses_backend
+EnvironmentFile=/var/www/on_courses_backend/.env
+ExecStart=/var/www/on_courses_backend/.venv/bin/gunicorn \
+    --workers 3 \
+    --bind unix:/var/www/on_courses_backend/oncourses.sock \
+    config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+# Iniciar servicio
+sudo systemctl start oncourses
+sudo systemctl enable oncourses
+```
+
+### Configuración de Nginx
+
+Crear archivo `/etc/nginx/sites-available/oncourses`:
+
+```nginx
+server {
+    listen 80;
+    server_name tu-dominio.com;
+
+    location /static/ {
+        alias /var/www/on_courses_backend/staticfiles/;
+    }
+
+    location /media/ {
+        alias /var/www/on_courses_backend/media/;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/var/www/on_courses_backend/oncourses.sock;
+    }
+}
+```
+
+```bash
+# Activar sitio y reiniciar Nginx
+sudo ln -s /etc/nginx/sites-available/oncourses /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+
+# Recolectar archivos estáticos
+cd /var/www/on_courses_backend
+uv run python manage.py collectstatic --noinput
+```
+
+### HTTPS con Certbot (Recomendado)
+
+```bash
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d tu-dominio.com
+```
+
+---
+
+## 🛠 Tecnologías
+
+<div align="center">
+
+| Categoría | Tecnología |
+|---|---|
+| **Backend** | ![Django](https://img.shields.io/badge/Django-5.2-092E20?style=flat-square&logo=django) ![DRF](https://img.shields.io/badge/DRF-3.16-A30000?style=flat-square&logo=django) |
+| **Lenguaje** | ![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=flat-square&logo=python) |
+| **Base de Datos** | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=flat-square&logo=postgresql) |
+| **Auth** | ![JWT](https://img.shields.io/badge/JWT-SimpleJWT-000000?style=flat-square&logo=jsonwebtokens) |
+| **Documentación** | ![Swagger](https://img.shields.io/badge/Swagger-drf--spectacular-85EA2D?style=flat-square&logo=swagger) |
+| **Gestor de Paquetes** | ![uv](https://img.shields.io/badge/uv-0.11-FFD43B?style=flat-square&logo=python) |
+| **Servidor** | ![Gunicorn](https://img.shields.io/badge/Gunicorn-Prod-499848?style=flat-square&logo=gunicorn) ![Nginx](https://img.shields.io/badge/Nginx-Reverse--Proxy-009639?style=flat-square&logo=nginx) |
+| **Tests** | ![Django Test](https://img.shields.io/badge/TestCase-35%20tests-14854F?style=flat-square&logo=django) |
+| **Filtros** | ![django-filter](https://img.shields.io/badge/django--filter-25.1-0D6EFD?style=flat-square) |
+| **CORS** | ![CORS](https://img.shields.io/badge/django--cors--headers-4.6-FF6B6B?style=flat-square) |
+
+</div>
+
+---
+
+## 📄 Licencia
+
+Este proyecto está bajo la licencia **MIT**. Hecho con ❤️ para el curso de Programación Avanzada.
+
+---
+
+<div align="center">
+
+**OnCourses API** — *Plataforma de Cursos Online de Tecnología*
+
+[Reportar Bug](https://github.com/AlexLopezF04/on_courses_backend/issues) · [Solicitar Feature](https://github.com/AlexLopezF04/on_courses_backend/issues) · [Documentación API](/api/docs/)
+
+</div>
