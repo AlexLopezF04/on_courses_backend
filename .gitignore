@@ -7,3 +7,5 @@ db.sqlite3
 dist/
 build/
 media/
+guia_estudio.md
+guia_postman.md
