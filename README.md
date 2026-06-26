@@ -720,7 +720,7 @@ sudo certbot --nginx -d tu-dominio.com
 
 **OnCourses API** — *Plataforma de Cursos Online de Tecnología*
 
-Hecho con ❤️ para el curso de Programación Avanzada
+Hecho con ❤️ y uno que otro ☕ de Alex López para ti. 
 
 [Reportar Bug](https://github.com/AlexLopezF04/on_courses_backend/issues) · [Solicitar Feature](https://github.com/AlexLopezF04/on_courses_backend/issues) · [Documentación API](/api/docs/)
 
