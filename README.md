@@ -77,29 +77,274 @@ on_courses_backend/
 
 **32 tablas** distribuidas en 6 módulos, más 11 tablas del framework Django = **43 tablas en PostgreSQL**.
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    DIAGRAMA ENTIDAD-RELACIÓN                 │
-│                                                             │
-│  Usuarios ──┐                                               │
-│    │        ├── Cursos ── Módulos ── Lecciones ── Recursos  │
-│    │        │       │                                       │
-│    │        │       ├── Foros ── Mensajes                   │
-│    │        │       ├── Anuncios                            │
-│    │        │       └── Comentarios                         │
-│    │        │                                               │
-│    ├── Inscripciones ── Progreso_lecciones                  │
-│    │       └── Exámenes ── Intentos ── Certificados         │
-│    │                                                         │
-│    ├── Logros_usuarios ── Logros                            │
-│    ├── Reseñas                                              │
-│    ├── Carrito ── Items                                     │
-│    ├── Órdenes ── Items                                     │
-│    └── Tickets ── Mensajes                                  │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+erDiagram
+    %% ========== MÓDULO 1: USUARIOS ==========
+    User {
+        int id PK
+        varchar username
+        varchar email
+        varchar password
+        varchar role "student | professor | admin"
+        bool is_active
+    }
+    StudentProfile {
+        int id PK
+        int user_id FK
+        text bio
+        varchar avatar
+    }
+    ProfessorProfile {
+        int id PK
+        int user_id FK
+        text bio
+        varchar specialization
+        varchar avatar
+    }
+    AccessLog {
+        int id PK
+        int user_id FK
+        datetime login_at
+        varchar ip_address
+    }
+    %% ========== MÓDULO 2: CURSOS ==========
+    Category {
+        int id PK
+        varchar name
+        varchar slug
+    }
+    Course {
+        int id PK
+        int category_id FK
+        int professor_id FK
+        varchar title
+        varchar slug
+        decimal price
+        text description
+        varchar cover_image
+    }
+    Module {
+        int id PK
+        int course_id FK
+        varchar title
+        int order
+    }
+    Lesson {
+        int id PK
+        int module_id FK
+        varchar title
+        text content
+        int order
+    }
+    Resource {
+        int id PK
+        int lesson_id FK
+        varchar title
+        varchar file
+    }
+    %% ========== MÓDULO 3: COMUNIDAD ==========
+    ForumThread {
+        int id PK
+        int course_id FK
+        int user_id FK
+        varchar title
+        text content
+    }
+    ForumPost {
+        int id PK
+        int thread_id FK
+        int user_id FK
+        text content
+    }
+    Announcement {
+        int id PK
+        int course_id FK
+        int professor_id FK
+        varchar title
+        text content
+    }
+    LessonComment {
+        int id PK
+        int lesson_id FK
+        int user_id FK
+        int parent_id FK "self-ref"
+        text content
+    }
+    %% ========== MÓDULO 4: PROGRESO ==========
+    Enrollment {
+        int id PK
+        int user_id FK
+        int course_id FK
+        date enrolled_at
+        bool completed
+    }
+    LessonProgress {
+        int id PK
+        int user_id FK
+        int lesson_id FK
+        bool completed
+    }
+    QuestionBank {
+        int id PK
+        int course_id FK
+        text question_text
+    }
+    QuestionOption {
+        int id PK
+        int question_id FK
+        text option_text
+        bool is_correct
+    }
+    Exam {
+        int id PK
+        int course_id FK
+        varchar title
+        int passing_score
+    }
+    ExamQuestion {
+        int id PK
+        int exam_id FK
+        int question_id FK
+        int points
+    }
+    ExamAttempt {
+        int id PK
+        int exam_id FK
+        int user_id FK
+        int score
+        bool passed
+    }
+    AttemptAnswer {
+        int id PK
+        int attempt_id FK
+        int question_id FK
+        int selected_option_id FK
+        bool is_correct
+    }
+    Certificate {
+        int id PK
+        int user_id FK
+        int course_id FK
+        date issued_at
+        varchar code
+    }
+    %% ========== MÓDULO 5: GAMIFICACIÓN ==========
+    Achievement {
+        int id PK
+        varchar name
+        text description
+        varchar icon
+    }
+    UserAchievement {
+        int id PK
+        int user_id FK
+        int achievement_id FK
+        date earned_at
+    }
+    Review {
+        int id PK
+        int user_id FK
+        int course_id FK
+        int rating "1-5"
+        text comment
+    }
+    %% ========== MÓDULO 6: COMERCIAL ==========
+    Cart {
+        int id PK
+        int user_id FK "1 to 1"
+    }
+    CartItem {
+        int id PK
+        int cart_id FK
+        int course_id FK
+    }
+    Coupon {
+        int id PK
+        varchar code
+        decimal discount
+        varchar discount_type "percent | fixed"
+    }
+    Order {
+        int id PK
+        int user_id FK
+        int coupon_id FK
+        decimal total
+        varchar status
+    }
+    OrderItem {
+        int id PK
+        int order_id FK
+        int course_id FK
+        decimal price
+    }
+    SupportTicket {
+        int id PK
+        int user_id FK
+        varchar subject
+        varchar status
+    }
+    SupportMessage {
+        int id PK
+        int ticket_id FK
+        int user_id FK
+        text message
+    }
+
+    %% ========== RELACIONES ==========
+    User ||--o{ StudentProfile : "tiene"
+    User ||--o{ ProfessorProfile : "tiene"
+    User ||--o{ AccessLog : "registra"
+    User ||--o{ ForumThread : "crea"
+    User ||--o{ ForumPost : "publica"
+    User ||--o{ LessonComment : "comenta"
+    User ||--o{ Enrollment : "se inscribe"
+    User ||--o{ LessonProgress : "avanza"
+    User ||--o{ ExamAttempt : "intenta"
+    User ||--o{ Certificate : "obtiene"
+    User ||--o{ UserAchievement : "desbloquea"
+    User ||--o{ Review : "califica"
+    User ||--o{ Order : "compra"
+    User ||--o{ SupportTicket : "solicita"
+    User ||--o{ SupportMessage : "escribe"
+    User |o--|| Cart : "posee"
+
+    Category ||--o{ Course : "contiene"
+    ProfessorProfile ||--o{ Course : "dicta"
+    Course ||--o{ Module : "compone"
+    Course ||--o{ ForumThread : "tiene"
+    Course ||--o{ Announcement : "publica"
+    Course ||--o{ Enrollment : "inscribe"
+    Course ||--o{ QuestionBank : "banco"
+    Course ||--o{ Exam : "evalua"
+    Course ||--o{ Review : "recibe"
+    Course ||--o{ CartItem : "agregado"
+    Course ||--o{ OrderItem : "vendido"
+    Module ||--o{ Lesson : "contiene"
+    Lesson ||--o{ Resource : "adjunta"
+    Lesson ||--o{ LessonComment : "discute"
+    Lesson ||--o{ LessonProgress : "seguimiento"
+
+    ForumThread ||--o{ ForumPost : "responde"
+    LessonComment ||--o{ LessonComment : "responde a"
+
+    QuestionBank ||--o{ QuestionOption : "opciones"
+    QuestionBank ||--o{ ExamQuestion : "asignada"
+    Exam ||--o{ ExamQuestion : "incluye"
+    Exam ||--o{ ExamAttempt : "tiene"
+
+    ExamAttempt ||--o{ AttemptAnswer : "contiene"
+    AttemptAnswer ||--o{ QuestionOption : "selecciona"
+
+    Achievement ||--o{ UserAchievement : "otorgado"
+    Enrollment ||--o{ Certificate : "genera"
+
+    Cart ||--o{ CartItem : "contiene"
+    Coupon ||--o{ Order : "aplica"
+    Order ||--o{ OrderItem : "detalla"
+    SupportTicket ||--o{ SupportMessage : "mensajes"
 ```
 
-> 💡 **Nota:** En [`dbdiagram.txt`](dbdiagram.txt) encontrarás el script completo para visualizar el diagrama en [dbdiagram.io](https://dbdiagram.io).
+> 💡 **Nota:** El diagrama se renderiza automáticamente en GitHub. También puedes visualizarlo en [dbdiagram.io](https://dbdiagram.io) importando el script [`dbdiagram.txt`](dbdiagram.txt).
 
 ---
 
