@@ -37,14 +37,18 @@
 
 ### ✨ Funcionalidades Principales
 
-| Módulo | Descripción |
-|---|---|
-| 👤 **Usuarios y Auth** | Registro, login JWT, 3 roles (estudiante, profesor, admin), perfiles |
-| 📚 **Cursos** | Categorías, cursos, módulos, lecciones, recursos descargables |
-| 💬 **Comunidad** | Foros por curso, anuncios, comentarios con respuestas anidadas |
-| 📈 **Progreso** | Inscripciones, avance por lección, banco de preguntas, exámenes, certificados |
-| 🏆 **Gamificación** | Logros, reseñas y calificaciones de cursos |
-| 🛒 **Comercial** | Carrito de compras, cupones de descuento, órdenes, tickets de soporte |
+<div align="center">
+
+| # | Módulo | Descripción |
+|---|--------|-------------|
+| 01 | 👤 **Usuarios y Auth** | Registro, login JWT, 3 roles (estudiante, profesor, admin), perfiles |
+| 02 | 📚 **Cursos** | Categorías, cursos, módulos, lecciones, recursos descargables |
+| 03 | 💬 **Comunidad** | Foros por curso, anuncios, comentarios con respuestas anidadas |
+| 04 | 📈 **Progreso** | Inscripciones, avance por lección, banco de preguntas, exámenes, certificados |
+| 05 | 🏆 **Gamificación** | Logros, reseñas y calificaciones de cursos |
+| 06 | 🛒 **Comercial** | Carrito de compras, cupones de descuento, órdenes, tickets de soporte |
+
+</div>
 
 ---
 
@@ -508,86 +512,86 @@ curl -X POST http://localhost:8000/api/cart-items/ \
 
 ## 📍 Endpoints
 
-### Autenticación
+### 🔐 Autenticación
 
-| Método | Ruta | Permiso | Descripción |
+| # | Método | Ruta | Acceso | Descripción |
+|---|---|---|---|---|
+| 01 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/health/` | 🌐 Público | Verificar servidor |
+| 02 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/auth/register/` | 🌐 Público | Registrar usuario |
+| 03 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/auth/login/` | 🌐 Público | Iniciar sesión (JWT) |
+| 04 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/auth/refresh/` | 🌐 Público | Refrescar token |
+
+### 👤 Usuarios
+
+| # | Método | Ruta | Acceso | Descripción |
+|---|---|---|---|---|
+| 05 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/users/` | 👑 Admin | Listar usuarios |
+| 06 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/users/{id}/` | 🔑 Owner/Admin | Ver perfil |
+| 07 | ![](https://img.shields.io/badge/PATCH-FFC107?style=flat-square) | `/api/users/{id}/` | 🔑 Owner/Admin | Actualizar perfil |
+| 08 | ![](https://img.shields.io/badge/DELETE-DC3545?style=flat-square) | `/api/users/{id}/` | 👑 Admin | Eliminar usuario |
+
+### 📚 Cursos
+
+| # | Método | Ruta | Acceso | Descripción |
+|---|---|---|---|---|
+| 09 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/categories/` | 🌐 Público | Listar categorías |
+| 10 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/categories/` | 👑 Admin | Crear categoría |
+| 11 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/courses/` | 🌐 Público | Listar cursos |
+| 12 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/courses/` | 🎓 Profesor/Admin | Crear curso |
+| 13 | ![](https://img.shields.io/badge/PATCH-FFC107?style=flat-square) | `/api/courses/{id}/` | 🔑 Owner/Admin | Actualizar curso |
+| 14 | ![](https://img.shields.io/badge/DELETE-DC3545?style=flat-square) | `/api/courses/{id}/` | 👑 Admin | Eliminar curso |
+| 15 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/modules/` | 🎓 Profesor/Admin | Crear módulo |
+| 16 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/lessons/` | 🎓 Profesor/Admin | Crear lección |
+| 17 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/resources/` | 🎓 Profesor/Admin | Subir recurso |
+
+### 💬 Comunidad
+
+| # | Método | Ruta | Acceso | Descripción |
+|---|---|---|---|---|
+| 18 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/forum-threads/` | 🌐 Público | Listar hilos |
+| 19 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/forum-threads/` | 🔒 Autenticado | Crear hilo |
+| 20 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/forum-posts/` | 🔒 Autenticado | Responder hilo |
+| 21 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/announcements/` | 🔒 Autenticado | Ver anuncios |
+| 22 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/announcements/` | 🎓 Profesor/Admin | Crear anuncio |
+| 23 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/lesson-comments/` | 🔒 Autenticado | Comentar lección |
+
+### 📈 Progreso
+
+| # | Método | Ruta | Acceso | Descripción |
+|---|---|---|---|---|
+| 24 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/enrollments/` | 🔒 Autenticado | Inscribirse a curso |
+| 25 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/lesson-progress/` | 🔒 Autenticado | Actualizar progreso |
+| 26 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/exam-attempts/` | 🔒 Autenticado | Iniciar intento |
+| 27 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/exam-attempts/{id}/submit/` | 🔒 Autenticado | Entregar respuestas |
+| 28 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/certificates/` | 👑 Admin | Listar certificados |
+
+### 🏆 Gamificación
+
+| # | Método | Ruta | Acceso | Descripción |
+|---|---|---|---|---|
+| 29 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/achievements/` | 🌐 Público | Listar logros |
+| 30 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/achievements/` | 👑 Admin | Crear logro |
+| 31 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/reviews/` | 🔒 Autenticado | Calificar curso |
+
+### 🛒 Comercial
+
+| # | Método | Ruta | Acceso | Descripción |
+|---|---|---|---|---|
+| 32 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/carts/mine/` | 🔒 Autenticado | Ver mi carrito |
+| 33 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/cart-items/` | 🔒 Autenticado | Agregar curso |
+| 34 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/coupons/validate/?code=X` | 🌐 Público | Validar cupón |
+| 35 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/orders/` | 🔒 Autenticado | Crear orden |
+| 36 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/orders/{id}/pay/` | 🔒 Autenticado | Pagar orden |
+| 37 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/support-tickets/` | 🔒 Autenticado | Abrir ticket |
+| 38 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/support-tickets/{id}/add_message/` | 🔒 Autenticado | Responder ticket |
+
+### 📖 Documentación
+
+| # | Método | Ruta | Descripción |
 |---|---|---|---|
-| `GET` | `/api/health/` | Público | Verificar servidor |
-| `POST` | `/api/auth/register/` | Público | Registrar usuario |
-| `POST` | `/api/auth/login/` | Público | Iniciar sesión (JWT) |
-| `POST` | `/api/auth/refresh/` | Público | Refrescar token |
-
-### Usuarios
-
-| Método | Ruta | Permiso | Descripción |
-|---|---|---|---|
-| `GET` | `/api/users/` | Admin | Listar usuarios |
-| `GET` | `/api/users/{id}/` | Owner/Admin | Ver perfil |
-| `PATCH` | `/api/users/{id}/` | Owner/Admin | Actualizar perfil |
-| `DELETE` | `/api/users/{id}/` | Admin | Eliminar usuario |
-
-### Cursos
-
-| Método | Ruta | Permiso | Descripción |
-|---|---|---|---|
-| `GET` | `/api/categories/` | Público | Listar categorías |
-| `POST` | `/api/categories/` | Admin | Crear categoría |
-| `GET` | `/api/courses/` | Público | Listar cursos |
-| `POST` | `/api/courses/` | Profesor/Admin | Crear curso |
-| `PATCH` | `/api/courses/{id}/` | Owner/Admin | Actualizar curso |
-| `DELETE` | `/api/courses/{id}/` | Admin | Eliminar curso |
-| `POST` | `/api/modules/` | Profesor/Admin | Crear módulo |
-| `POST` | `/api/lessons/` | Profesor/Admin | Crear lección |
-| `POST` | `/api/resources/` | Profesor/Admin | Subir recurso |
-
-### Comunidad
-
-| Método | Ruta | Permiso | Descripción |
-|---|---|---|---|
-| `GET` | `/api/forum-threads/` | Público | Listar hilos |
-| `POST` | `/api/forum-threads/` | Autenticado | Crear hilo |
-| `POST` | `/api/forum-posts/` | Autenticado | Responder hilo |
-| `GET` | `/api/announcements/` | Autenticado | Ver anuncios |
-| `POST` | `/api/announcements/` | Profesor/Admin | Crear anuncio |
-| `POST` | `/api/lesson-comments/` | Autenticado | Comentar lección |
-
-### Progreso
-
-| Método | Ruta | Permiso | Descripción |
-|---|---|---|---|
-| `POST` | `/api/enrollments/` | Autenticado | Inscribirse a curso |
-| `POST` | `/api/lesson-progress/` | Autenticado | Actualizar progreso |
-| `POST` | `/api/exam-attempts/` | Autenticado | Iniciar intento |
-| `POST` | `/api/exam-attempts/{id}/submit/` | Autenticado | Entregar respuestas |
-| `GET` | `/api/certificates/` | Admin | Listar certificados |
-
-### Gamificación
-
-| Método | Ruta | Permiso | Descripción |
-|---|---|---|---|
-| `GET` | `/api/achievements/` | Público | Listar logros |
-| `POST` | `/api/achievements/` | Admin | Crear logro |
-| `POST` | `/api/reviews/` | Autenticado | Calificar curso |
-
-### Comercial
-
-| Método | Ruta | Permiso | Descripción |
-|---|---|---|---|
-| `GET` | `/api/carts/mine/` | Autenticado | Ver mi carrito |
-| `POST` | `/api/cart-items/` | Autenticado | Agregar curso |
-| `GET` | `/api/coupons/validate/?code=X` | Público | Validar cupón |
-| `POST` | `/api/orders/` | Autenticado | Crear orden |
-| `POST` | `/api/orders/{id}/pay/` | Autenticado | Pagar orden |
-| `POST` | `/api/support-tickets/` | Autenticado | Abrir ticket |
-| `POST` | `/api/support-tickets/{id}/add_message/` | Autenticado | Responder ticket |
-
-### Documentación
-
-| Método | Ruta | Descripción |
-|---|---|---|
-| `GET` | `/api/docs/` | Swagger UI (interactivo) |
-| `GET` | `/api/redoc/` | ReDoc (lectura) |
-| `GET` | `/api/schema/` | Schema OpenAPI (JSON) |
+| 39 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/docs/` | Swagger UI (interactivo) |
+| 40 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/redoc/` | ReDoc (lectura) |
+| 41 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/schema/` | Schema OpenAPI (JSON) |
 
 ---
 
