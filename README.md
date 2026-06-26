@@ -11,8 +11,8 @@
 
 ![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-Docs-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
-![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-FF6B6B?style=for-the-badge)
+![Postman](https://img.shields.io/badge/Postman-Collection-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
+![Pillow](https://img.shields.io/badge/Pillow-File%20Upload-3776AB?style=for-the-badge&logo=python&logoColor=white)
 
 ---
 
@@ -28,21 +28,12 @@
 - [Endpoints](#-endpoints)
 - [Despliegue en Producción](#-despliegue-en-producción)
 - [Tecnologías](#-tecnologías)
-- [Autores](#-autores)
 
 ---
 
 ## 📖 Información General
 
 **OnCourses** es una plataforma de cursos online enfocada en tecnología. Este repositorio contiene el **backend** completo desarrollado con Django y Django REST Framework, diseñado para ser consumido por aplicaciones web (React/Next.js) y móviles (Flutter/React Native).
-
-### 👥 Integrantes
-
-| Integrante | Rol |
-|---|---|
-| *Tu nombre aquí* | Backend Developer |
-| *Compañero 1* | Frontend Developer |
-| *Compañero 2* | Mobile Developer |
 
 ### ✨ Funcionalidades Principales
 
@@ -129,13 +120,13 @@ cd on_courses_backend
 
 # 2. Crear la base de datos en PostgreSQL
 psql -U postgres
-CREATE DATABASE on_courses_db;
-CREATE USER on_courses_user WITH PASSWORD 'on_courses_pass';
-ALTER ROLE on_courses_user SET client_encoding TO 'utf8';
-ALTER ROLE on_courses_user SET default_transaction_isolation TO 'read committed';
-ALTER ROLE on_courses_user SET timezone TO 'UTC';
-GRANT ALL PRIVILEGES ON DATABASE on_courses_db TO on_courses_user;
-ALTER USER on_courses_user CREATEDB;
+CREATE DATABASE nombre_bd;
+CREATE USER nombre_usuario WITH PASSWORD 'tu_contraseña_segura';
+ALTER ROLE nombre_usuario SET client_encoding TO 'utf8';
+ALTER ROLE nombre_usuario SET default_transaction_isolation TO 'read committed';
+ALTER ROLE nombre_usuario SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE nombre_bd TO nombre_usuario;
+ALTER USER nombre_usuario CREATEDB;
 \q
 
 # 3. Configurar variables de entorno
@@ -163,10 +154,10 @@ SECRET_KEY=tu-secret-key-aqui
 DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 
-# PostgreSQL
-DB_NAME=on_courses_db
-DB_USER=on_courses_user
-DB_PASSWORD=on_courses_pass
+# PostgreSQL (usar las credenciales que creaste en el paso anterior)
+DB_NAME=nombre_bd
+DB_USER=nombre_usuario
+DB_PASSWORD=tu_contraseña_segura
 DB_HOST=localhost
 DB_PORT=5432
 
@@ -377,10 +368,10 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 sudo -u postgres psql
 
 # Crear base de datos y usuario
-CREATE DATABASE on_courses_db;
-CREATE USER on_courses_user WITH PASSWORD 'password_seguro';
-GRANT ALL PRIVILEGES ON DATABASE on_courses_db TO on_courses_user;
-ALTER USER on_courses_user CREATEDB;
+CREATE DATABASE nombre_bd;
+CREATE USER nombre_usuario WITH PASSWORD 'tu_contraseña_segura';
+GRANT ALL PRIVILEGES ON DATABASE nombre_bd TO nombre_usuario;
+ALTER USER nombre_usuario CREATEDB;
 \q
 ```
 
@@ -473,20 +464,18 @@ sudo certbot --nginx -d tu-dominio.com
 | **Tests** | ![Django Test](https://img.shields.io/badge/TestCase-35%20tests-14854F?style=flat-square&logo=django) |
 | **Filtros** | ![django-filter](https://img.shields.io/badge/django--filter-25.1-0D6EFD?style=flat-square) |
 | **CORS** | ![CORS](https://img.shields.io/badge/django--cors--headers-4.6-FF6B6B?style=flat-square) |
+| **File Upload** | ![Pillow](https://img.shields.io/badge/Pillow-11.1-3776AB?style=flat-square&logo=python) |
+| **API Client** | ![Postman](https://img.shields.io/badge/Postman-Collection-FF6C37?style=flat-square&logo=postman) |
 
 </div>
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia **MIT**. Hecho con ❤️ para el curso de Programación Avanzada.
 
 ---
 
 <div align="center">
 
 **OnCourses API** — *Plataforma de Cursos Online de Tecnología*
+
+Hecho con ❤️ para el curso de Programación Avanzada
 
 [Reportar Bug](https://github.com/AlexLopezF04/on_courses_backend/issues) · [Solicitar Feature](https://github.com/AlexLopezF04/on_courses_backend/issues) · [Documentación API](/api/docs/)
 
