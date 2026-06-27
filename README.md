@@ -81,98 +81,21 @@ on_courses_backend/
 
 **32 tablas** distribuidas en 6 módulos, más 11 tablas del framework Django = **43 tablas en PostgreSQL**.
 
-```mermaid
-flowchart TD
-    subgraph USR["👤 Usuarios"]
-        U["User"]
-        SP["StudentProfile"]
-        PP["ProfessorProfile"]
-        AL["AccessLog"]
-    end
-    subgraph CRS["📚 Cursos"]
-        CAT["Category"]
-        CO["Course"]
-        MO["Module"]
-        LE["Lesson"]
-        RE["Resource"]
-    end
-    subgraph COM["💬 Comunidad"]
-        FT["ForumThread"]
-        FP["ForumPost"]
-        AN["Announcement"]
-        LC["LessonComment"]
-    end
-    subgraph PRO["📈 Progreso"]
-        EN["Enrollment"]
-        LP["LessonProgress"]
-        QB["QuestionBank"]
-        QO["QuestionOption"]
-        EX["Exam"]
-        EQ["ExamQuestion"]
-        EA["ExamAttempt"]
-        AA["AttemptAnswer"]
-        CE["Certificate"]
-    end
-    subgraph GAM["🏆 Gamificación"]
-        AC["Achievement"]
-        UA["UserAchievement"]
-        RV["Review"]
-    end
-    subgraph COMER["🛒 Comercial"]
-        CT["Cart"]
-        CI["CartItem"]
-        CP["Coupon"]
-        OD["Order"]
-        OI["OrderItem"]
-        ST["SupportTicket"]
-        SM["SupportMessage"]
-    end
+![Diagrama Entidad-Relación](docs/er-diagram.svg)
 
-    U --- SP & PP & AL
-    U --- FT & FP & LC
-    U --- EN & LP & EA & CE
-    U --- UA & RV
-    U --- OD & ST & SM
-    U -.- CT
-
-    CAT --- CO
-    PP --- CO
-    CO --- MO & FT & AN
-    CO --- EN & QB & EX
-    CO --- RV
-    CO --- OI
-    CO -.- CI
-
-    MO --- LE
-    LE --- RE & LC & LP
-
-    FT --- FP
-    QB --- QO & EQ
-    EX --- EQ & EA
-    EA --- AA
-    AA --- QO
-
-    AC --- UA
-    EN --- CE
-
-    CT --- CI
-    CP --- OD
-    OD --- OI
-    ST --- SM
-```
-
-> 💡 **Nota:** También puedes visualizar el diagrama completo con campos en [dbdiagram.io](https://dbdiagram.io) importando el script [`dbdiagram.txt`](dbdiagram.txt).
+> 💡 También puedes visualizar el diagrama interactivo en [dbdiagram.io](https://dbdiagram.io) importando [`dbdiagram.txt`](dbdiagram.txt).
 
 <div align="center">
 
-| Módulo | Tablas |
-|--------|--------|
-| 👤 **Usuarios** | `User`, `StudentProfile`, `ProfessorProfile`, `AccessLog` |
-| 📚 **Cursos** | `Category`, `Course`, `Module`, `Lesson`, `Resource` |
-| 💬 **Comunidad** | `ForumThread`, `ForumPost`, `Announcement`, `LessonComment` |
-| 📈 **Progreso** | `Enrollment`, `LessonProgress`, `QuestionBank`, `QuestionOption`, `Exam`, `ExamQuestion`, `ExamAttempt`, `AttemptAnswer`, `Certificate` |
-| 🏆 **Gamificación** | `Achievement`, `UserAchievement`, `Review` |
-| 🛒 **Comercial** | `Cart`, `CartItem`, `Coupon`, `Order`, `OrderItem`, `SupportTicket`, `SupportMessage` |
+| # | Módulo | Tablas | Total |
+|---|--------|--------|:-----:|
+| 01 | 👤 **Usuarios** | `User`, `StudentProfile`, `ProfessorProfile`, `AccessLog` | 4 |
+| 02 | 📚 **Cursos** | `Category`, `Course`, `Module`, `Lesson`, `Resource` | 5 |
+| 03 | 💬 **Comunidad** | `ForumThread`, `ForumPost`, `Announcement`, `LessonComment` | 4 |
+| 04 | 📈 **Progreso** | `Enrollment`, `LessonProgress`, `QuestionBank`, `QuestionOption`, `Exam`, `ExamQuestion`, `ExamAttempt`, `AttemptAnswer`, `Certificate` | 9 |
+| 05 | 🏆 **Gamificación** | `Achievement`, `UserAchievement`, `Review` | 3 |
+| 06 | 🛒 **Comercial** | `Cart`, `CartItem`, `Coupon`, `Order`, `OrderItem`, `SupportTicket`, `SupportMessage` | 7 |
+| | **Total** | **32 tablas de negocio + 11 de Django = 43 en PostgreSQL** | **32** |
 
 </div>
 
