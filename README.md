@@ -83,218 +83,6 @@ on_courses_backend/
 
 ```mermaid
 erDiagram
-    %% ========== MÓDULO 1: USUARIOS ==========
-    User {
-        int id PK
-        varchar username
-        varchar email
-        varchar password
-        varchar role "student | professor | admin"
-        bool is_active
-    }
-    StudentProfile {
-        int id PK
-        int user_id FK
-        text bio
-        varchar avatar
-    }
-    ProfessorProfile {
-        int id PK
-        int user_id FK
-        text bio
-        varchar specialization
-        varchar avatar
-    }
-    AccessLog {
-        int id PK
-        int user_id FK
-        datetime login_at
-        varchar ip_address
-    }
-    %% ========== MÓDULO 2: CURSOS ==========
-    Category {
-        int id PK
-        varchar name
-        varchar slug
-    }
-    Course {
-        int id PK
-        int category_id FK
-        int professor_id FK
-        varchar title
-        varchar slug
-        decimal price
-        text description
-        varchar cover_image
-    }
-    Module {
-        int id PK
-        int course_id FK
-        varchar title
-        int order
-    }
-    Lesson {
-        int id PK
-        int module_id FK
-        varchar title
-        text content
-        int order
-    }
-    Resource {
-        int id PK
-        int lesson_id FK
-        varchar title
-        varchar file
-    }
-    %% ========== MÓDULO 3: COMUNIDAD ==========
-    ForumThread {
-        int id PK
-        int course_id FK
-        int user_id FK
-        varchar title
-        text content
-    }
-    ForumPost {
-        int id PK
-        int thread_id FK
-        int user_id FK
-        text content
-    }
-    Announcement {
-        int id PK
-        int course_id FK
-        int professor_id FK
-        varchar title
-        text content
-    }
-    LessonComment {
-        int id PK
-        int lesson_id FK
-        int user_id FK
-        int parent_id FK "self-ref"
-        text content
-    }
-    %% ========== MÓDULO 4: PROGRESO ==========
-    Enrollment {
-        int id PK
-        int user_id FK
-        int course_id FK
-        date enrolled_at
-        bool completed
-    }
-    LessonProgress {
-        int id PK
-        int user_id FK
-        int lesson_id FK
-        bool completed
-    }
-    QuestionBank {
-        int id PK
-        int course_id FK
-        text question_text
-    }
-    QuestionOption {
-        int id PK
-        int question_id FK
-        text option_text
-        bool is_correct
-    }
-    Exam {
-        int id PK
-        int course_id FK
-        varchar title
-        int passing_score
-    }
-    ExamQuestion {
-        int id PK
-        int exam_id FK
-        int question_id FK
-        int points
-    }
-    ExamAttempt {
-        int id PK
-        int exam_id FK
-        int user_id FK
-        int score
-        bool passed
-    }
-    AttemptAnswer {
-        int id PK
-        int attempt_id FK
-        int question_id FK
-        int selected_option_id FK
-        bool is_correct
-    }
-    Certificate {
-        int id PK
-        int user_id FK
-        int course_id FK
-        date issued_at
-        varchar code
-    }
-    %% ========== MÓDULO 5: GAMIFICACIÓN ==========
-    Achievement {
-        int id PK
-        varchar name
-        text description
-        varchar icon
-    }
-    UserAchievement {
-        int id PK
-        int user_id FK
-        int achievement_id FK
-        date earned_at
-    }
-    Review {
-        int id PK
-        int user_id FK
-        int course_id FK
-        int rating "1-5"
-        text comment
-    }
-    %% ========== MÓDULO 6: COMERCIAL ==========
-    Cart {
-        int id PK
-        int user_id FK "1 to 1"
-    }
-    CartItem {
-        int id PK
-        int cart_id FK
-        int course_id FK
-    }
-    Coupon {
-        int id PK
-        varchar code
-        decimal discount
-        varchar discount_type "percent | fixed"
-    }
-    Order {
-        int id PK
-        int user_id FK
-        int coupon_id FK
-        decimal total
-        varchar status
-    }
-    OrderItem {
-        int id PK
-        int order_id FK
-        int course_id FK
-        decimal price
-    }
-    SupportTicket {
-        int id PK
-        int user_id FK
-        varchar subject
-        varchar status
-    }
-    SupportMessage {
-        int id PK
-        int ticket_id FK
-        int user_id FK
-        text message
-    }
-
-    %% ========== RELACIONES ==========
     User ||--o{ StudentProfile : "tiene"
     User ||--o{ ProfessorProfile : "tiene"
     User ||--o{ AccessLog : "registra"
@@ -314,41 +102,56 @@ erDiagram
 
     Category ||--o{ Course : "contiene"
     ProfessorProfile ||--o{ Course : "dicta"
+
     Course ||--o{ Module : "compone"
     Course ||--o{ ForumThread : "tiene"
     Course ||--o{ Announcement : "publica"
     Course ||--o{ Enrollment : "inscribe"
-    Course ||--o{ QuestionBank : "banco"
+    Course ||--o{ QuestionBank : "posee"
     Course ||--o{ Exam : "evalua"
     Course ||--o{ Review : "recibe"
-    Course ||--o{ CartItem : "agregado"
+    Course ||--o{ CartItem : "agregado al carrito"
     Course ||--o{ OrderItem : "vendido"
+
     Module ||--o{ Lesson : "contiene"
     Lesson ||--o{ Resource : "adjunta"
     Lesson ||--o{ LessonComment : "discute"
-    Lesson ||--o{ LessonProgress : "seguimiento"
+    Lesson ||--o{ LessonProgress : "progreso"
 
     ForumThread ||--o{ ForumPost : "responde"
     LessonComment ||--o{ LessonComment : "responde a"
 
     QuestionBank ||--o{ QuestionOption : "opciones"
-    QuestionBank ||--o{ ExamQuestion : "asignada"
+    QuestionBank ||--o{ ExamQuestion : "asignada a"
     Exam ||--o{ ExamQuestion : "incluye"
-    Exam ||--o{ ExamAttempt : "tiene"
+    Exam ||--o{ ExamAttempt : "intentado"
 
-    ExamAttempt ||--o{ AttemptAnswer : "contiene"
+    ExamAttempt ||--o{ AttemptAnswer : "responde"
     AttemptAnswer ||--o{ QuestionOption : "selecciona"
 
     Achievement ||--o{ UserAchievement : "otorgado"
     Enrollment ||--o{ Certificate : "genera"
 
     Cart ||--o{ CartItem : "contiene"
-    Coupon ||--o{ Order : "aplica"
+    Coupon ||--o{ Order : "aplica descuento"
     Order ||--o{ OrderItem : "detalla"
-    SupportTicket ||--o{ SupportMessage : "mensajes"
+    SupportTicket ||--o{ SupportMessage : "recibe"
 ```
 
-> 💡 **Nota:** El diagrama se renderiza automáticamente en GitHub. También puedes visualizarlo en [dbdiagram.io](https://dbdiagram.io) importando el script [`dbdiagram.txt`](dbdiagram.txt).
+> 💡 **Nota:** También puedes visualizar el diagrama completo con campos en [dbdiagram.io](https://dbdiagram.io) importando el script [`dbdiagram.txt`](dbdiagram.txt).
+
+<div align="center">
+
+| Módulo | Tablas |
+|--------|--------|
+| 👤 **Usuarios** | `User`, `StudentProfile`, `ProfessorProfile`, `AccessLog` |
+| 📚 **Cursos** | `Category`, `Course`, `Module`, `Lesson`, `Resource` |
+| 💬 **Comunidad** | `ForumThread`, `ForumPost`, `Announcement`, `LessonComment` |
+| 📈 **Progreso** | `Enrollment`, `LessonProgress`, `QuestionBank`, `QuestionOption`, `Exam`, `ExamQuestion`, `ExamAttempt`, `AttemptAnswer`, `Certificate` |
+| 🏆 **Gamificación** | `Achievement`, `UserAchievement`, `Review` |
+| 🛒 **Comercial** | `Cart`, `CartItem`, `Coupon`, `Order`, `OrderItem`, `SupportTicket`, `SupportMessage` |
+
+</div>
 
 ---
 
@@ -514,6 +317,8 @@ curl -X POST http://localhost:8000/api/cart-items/ \
 
 ### 🔐 Autenticación
 
+<div align="center">
+
 | # | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|---|
 | 01 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/health/` | 🌐 Público | Verificar servidor |
@@ -521,7 +326,11 @@ curl -X POST http://localhost:8000/api/cart-items/ \
 | 03 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/auth/login/` | 🌐 Público | Iniciar sesión (JWT) |
 | 04 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/auth/refresh/` | 🌐 Público | Refrescar token |
 
+</div>
+
 ### 👤 Usuarios
+
+<div align="center">
 
 | # | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|---|
@@ -530,7 +339,11 @@ curl -X POST http://localhost:8000/api/cart-items/ \
 | 07 | ![](https://img.shields.io/badge/PATCH-FFC107?style=flat-square) | `/api/users/{id}/` | 🔑 Owner/Admin | Actualizar perfil |
 | 08 | ![](https://img.shields.io/badge/DELETE-DC3545?style=flat-square) | `/api/users/{id}/` | 👑 Admin | Eliminar usuario |
 
+</div>
+
 ### 📚 Cursos
+
+<div align="center">
 
 | # | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|---|
@@ -544,7 +357,11 @@ curl -X POST http://localhost:8000/api/cart-items/ \
 | 16 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/lessons/` | 🎓 Profesor/Admin | Crear lección |
 | 17 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/resources/` | 🎓 Profesor/Admin | Subir recurso |
 
+</div>
+
 ### 💬 Comunidad
+
+<div align="center">
 
 | # | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|---|
@@ -555,7 +372,11 @@ curl -X POST http://localhost:8000/api/cart-items/ \
 | 22 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/announcements/` | 🎓 Profesor/Admin | Crear anuncio |
 | 23 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/lesson-comments/` | 🔒 Autenticado | Comentar lección |
 
+</div>
+
 ### 📈 Progreso
+
+<div align="center">
 
 | # | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|---|
@@ -565,7 +386,11 @@ curl -X POST http://localhost:8000/api/cart-items/ \
 | 27 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/exam-attempts/{id}/submit/` | 🔒 Autenticado | Entregar respuestas |
 | 28 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/certificates/` | 👑 Admin | Listar certificados |
 
+</div>
+
 ### 🏆 Gamificación
+
+<div align="center">
 
 | # | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|---|
@@ -573,7 +398,11 @@ curl -X POST http://localhost:8000/api/cart-items/ \
 | 30 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/achievements/` | 👑 Admin | Crear logro |
 | 31 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/reviews/` | 🔒 Autenticado | Calificar curso |
 
+</div>
+
 ### 🛒 Comercial
+
+<div align="center">
 
 | # | Método | Ruta | Acceso | Descripción |
 |---|---|---|---|---|
@@ -585,13 +414,19 @@ curl -X POST http://localhost:8000/api/cart-items/ \
 | 37 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/support-tickets/` | 🔒 Autenticado | Abrir ticket |
 | 38 | ![](https://img.shields.io/badge/POST-198754?style=flat-square) | `/api/support-tickets/{id}/add_message/` | 🔒 Autenticado | Responder ticket |
 
+</div>
+
 ### 📖 Documentación
+
+<div align="center">
 
 | # | Método | Ruta | Descripción |
 |---|---|---|---|
 | 39 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/docs/` | Swagger UI (interactivo) |
 | 40 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/redoc/` | ReDoc (lectura) |
 | 41 | ![](https://img.shields.io/badge/GET-0D6EFD?style=flat-square) | `/api/schema/` | Schema OpenAPI (JSON) |
+
+</div>
 
 ---
 
