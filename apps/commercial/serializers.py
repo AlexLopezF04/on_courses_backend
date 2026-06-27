@@ -13,7 +13,10 @@ from apps.commercial.models import (
 
 class CartItemSerializer(serializers.ModelSerializer):
     course_title = serializers.CharField(source='course.title', read_only=True)
-    course_price = serializers.DecimalField(source='course.price', read_only=True, max_digits=10, decimal_places=2)
+    course_price = serializers.DecimalField(
+        source='course.price', read_only=True,
+        max_digits=10, decimal_places=2,
+    )
 
     class Meta:
         model = CartItem
