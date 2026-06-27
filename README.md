@@ -81,23 +81,55 @@ on_courses_backend/
 
 **32 tablas** distribuidas en 6 módulos, más 11 tablas del framework Django = **43 tablas en PostgreSQL**.
 
-![Diagrama Entidad-Relación](docs/er-diagram.svg)
+```
+📦 on_courses_db (PostgreSQL 16)
+│
+├── 👤 Usuarios (4)
+│   ├── User
+│   ├── StudentProfile
+│   ├── ProfessorProfile
+│   └── AccessLog
+│
+├── 📚 Cursos (5)
+│   ├── Category
+│   ├── Course
+│   ├── Module
+│   ├── Lesson
+│   └── Resource
+│
+├── 💬 Comunidad (4)
+│   ├── ForumThread
+│   ├── ForumPost
+│   ├── Announcement
+│   └── LessonComment
+│
+├── 📈 Progreso (9)
+│   ├── Enrollment
+│   ├── LessonProgress
+│   ├── QuestionBank
+│   ├── QuestionOption
+│   ├── Exam
+│   ├── ExamQuestion
+│   ├── ExamAttempt
+│   ├── AttemptAnswer
+│   └── Certificate
+│
+├── 🏆 Gamificación (3)
+│   ├── Achievement
+│   ├── UserAchievement
+│   └── Review
+│
+└── 🛒 Comercial (7)
+    ├── Cart
+    ├── CartItem
+    ├── Coupon
+    ├── Order
+    ├── OrderItem
+    ├── SupportTicket
+    └── SupportMessage
+```
 
 > 💡 También puedes visualizar el diagrama interactivo en [dbdiagram.io](https://dbdiagram.io) importando [`dbdiagram.txt`](dbdiagram.txt).
-
-<div align="center">
-
-| # | Módulo | Tablas | Total |
-|---|--------|--------|:-----:|
-| 01 | 👤 **Usuarios** | `User`, `StudentProfile`, `ProfessorProfile`, `AccessLog` | 4 |
-| 02 | 📚 **Cursos** | `Category`, `Course`, `Module`, `Lesson`, `Resource` | 5 |
-| 03 | 💬 **Comunidad** | `ForumThread`, `ForumPost`, `Announcement`, `LessonComment` | 4 |
-| 04 | 📈 **Progreso** | `Enrollment`, `LessonProgress`, `QuestionBank`, `QuestionOption`, `Exam`, `ExamQuestion`, `ExamAttempt`, `AttemptAnswer`, `Certificate` | 9 |
-| 05 | 🏆 **Gamificación** | `Achievement`, `UserAchievement`, `Review` | 3 |
-| 06 | 🛒 **Comercial** | `Cart`, `CartItem`, `Coupon`, `Order`, `OrderItem`, `SupportTicket`, `SupportMessage` | 7 |
-| | **Total** | **32 tablas de negocio + 11 de Django = 43 en PostgreSQL** | **32** |
-
-</div>
 
 ---
 
