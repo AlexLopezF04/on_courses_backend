@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from apps.progress.models import (
     Enrollment, LessonProgress, QuestionBank, QuestionOption,
@@ -67,6 +68,7 @@ class ExamSerializer(serializers.ModelSerializer):
         model = Exam
         fields = '__all__'
 
+    @extend_schema_field(serializers.IntegerField())
     def get_questions_count(self, obj):
         return obj.exam_questions.count()
 

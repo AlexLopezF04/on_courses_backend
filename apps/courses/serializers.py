@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from apps.courses.models import Category, Course, Module, Lesson, Resource
 
@@ -51,6 +52,7 @@ class CourseListSerializer(serializers.ModelSerializer):
             'modules_count', 'created_at'
         ]
 
+    @extend_schema_field(serializers.IntegerField())
     def get_modules_count(self, obj):
         return obj.modules.count()
 

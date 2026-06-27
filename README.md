@@ -417,7 +417,7 @@ curl -X POST http://localhost:8000/api/cart-items/ \
 sudo apt update && sudo apt upgrade -y
 
 # Instalar dependencias del sistema
-sudo apt install -y python3.13 python3.13-venv nginx postgresql postgresql-contrib
+sudo apt install -y python3.13 python3.13-venv nginx postgresql postgresql-contrib libpq-dev
 
 # Instalar uv
 curl -LsSf https://astral.sh/uv/install.sh | sh

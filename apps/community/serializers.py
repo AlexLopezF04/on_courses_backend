@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from apps.community.models import ForumThread, ForumPost, Announcement, LessonComment
 
@@ -18,6 +19,7 @@ class ForumThreadSerializer(serializers.ModelSerializer):
         model = ForumThread
         fields = '__all__'
 
+    @extend_schema_field(serializers.IntegerField())
     def get_posts_count(self, obj):
         return obj.posts.count()
 
@@ -67,6 +69,7 @@ class LessonCommentSerializer(serializers.ModelSerializer):
         model = LessonComment
         fields = '__all__'
 
+    @extend_schema_field(serializers.ListField())
     def get_replies(self, obj):
         if obj.replies.exists():
             return LessonCommentSerializer(obj.replies.all(), many=True).data
