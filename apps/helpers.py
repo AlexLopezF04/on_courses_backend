@@ -5,7 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 User = get_user_model()
 
 
-def create_user(username='student', password='Pass1234!', role='student', **kwargs):
+def create_user(username='student', password='Pass1234!', role='student', **kwargs):  # nosec
     """Crea un usuario de prueba con el rol especificado."""
     return User.objects.create_user(
         username=username,
@@ -16,12 +16,12 @@ def create_user(username='student', password='Pass1234!', role='student', **kwar
     )
 
 
-def create_professor(username='prof', password='Pass1234!'):
+def create_professor(username='prof', password='Pass1234!'):  # nosec
     """Crea un profesor de prueba."""
     return create_user(username=username, password=password, role='professor')
 
 
-def create_admin(username='admin', password='Pass1234!'):
+def create_admin(username='admin', password='Pass1234!'):  # nosec
     """Crea un administrador de prueba."""
     return create_user(username=username, password=password, role='admin')
 

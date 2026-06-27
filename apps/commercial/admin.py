@@ -23,7 +23,10 @@ class CartItemAdmin(admin.ModelAdmin):
 
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
-    list_display = ('code', 'discount_type', 'discount_value', 'is_active', 'current_uses', 'max_uses')
+    list_display = (
+        'code', 'discount_type', 'discount_value',
+        'is_active', 'current_uses', 'max_uses',
+    )
     list_filter = ('is_active', 'discount_type')
 
 
