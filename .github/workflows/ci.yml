@@ -50,6 +50,7 @@ jobs:
       DB_HOST: localhost
       SECRET_KEY: ci-test-key-not-for-prod
       ALLOWED_HOSTS: localhost
+      SECURE_SSL_REDIRECT: false
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
