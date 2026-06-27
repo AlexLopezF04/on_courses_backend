@@ -82,93 +82,83 @@ on_courses_backend/
 **32 tablas** distribuidas en 6 módulos, más 11 tablas del framework Django = **43 tablas en PostgreSQL**.
 
 ```mermaid
-erDiagram
-    User {}
-    StudentProfile {}
-    ProfessorProfile {}
-    AccessLog {}
-    Category {}
-    Course {}
-    Module {}
-    Lesson {}
-    Resource {}
-    ForumThread {}
-    ForumPost {}
-    Announcement {}
-    LessonComment {}
-    Enrollment {}
-    LessonProgress {}
-    QuestionBank {}
-    QuestionOption {}
-    Exam {}
-    ExamQuestion {}
-    ExamAttempt {}
-    AttemptAnswer {}
-    Certificate {}
-    Achievement {}
-    UserAchievement {}
-    Review {}
-    Cart {}
-    CartItem {}
-    Coupon {}
-    Order {}
-    OrderItem {}
-    SupportTicket {}
-    SupportMessage {}
+flowchart TD
+    subgraph USR["👤 Usuarios"]
+        U["User"]
+        SP["StudentProfile"]
+        PP["ProfessorProfile"]
+        AL["AccessLog"]
+    end
+    subgraph CRS["📚 Cursos"]
+        CAT["Category"]
+        CO["Course"]
+        MO["Module"]
+        LE["Lesson"]
+        RE["Resource"]
+    end
+    subgraph COM["💬 Comunidad"]
+        FT["ForumThread"]
+        FP["ForumPost"]
+        AN["Announcement"]
+        LC["LessonComment"]
+    end
+    subgraph PRO["📈 Progreso"]
+        EN["Enrollment"]
+        LP["LessonProgress"]
+        QB["QuestionBank"]
+        QO["QuestionOption"]
+        EX["Exam"]
+        EQ["ExamQuestion"]
+        EA["ExamAttempt"]
+        AA["AttemptAnswer"]
+        CE["Certificate"]
+    end
+    subgraph GAM["🏆 Gamificación"]
+        AC["Achievement"]
+        UA["UserAchievement"]
+        RV["Review"]
+    end
+    subgraph COMER["🛒 Comercial"]
+        CT["Cart"]
+        CI["CartItem"]
+        CP["Coupon"]
+        OD["Order"]
+        OI["OrderItem"]
+        ST["SupportTicket"]
+        SM["SupportMessage"]
+    end
 
-    User ||--o{ StudentProfile : "tiene"
-    User ||--o{ ProfessorProfile : "tiene"
-    User ||--o{ AccessLog : "registra"
-    User ||--o{ ForumThread : "crea"
-    User ||--o{ ForumPost : "publica"
-    User ||--o{ LessonComment : "comenta"
-    User ||--o{ Enrollment : "inscribe"
-    User ||--o{ LessonProgress : "avanza"
-    User ||--o{ ExamAttempt : "intenta"
-    User ||--o{ Certificate : "obtiene"
-    User ||--o{ UserAchievement : "desbloquea"
-    User ||--o{ Review : "califica"
-    User ||--o{ Order : "compra"
-    User ||--o{ SupportTicket : "solicita"
-    User ||--o{ SupportMessage : "escribe"
-    User |o--|| Cart : "posee"
+    U --- SP & PP & AL
+    U --- FT & FP & LC
+    U --- EN & LP & EA & CE
+    U --- UA & RV
+    U --- OD & ST & SM
+    U -.- CT
 
-    Category ||--o{ Course : "contiene"
-    ProfessorProfile ||--o{ Course : "dicta"
+    CAT --- CO
+    PP --- CO
+    CO --- MO & FT & AN
+    CO --- EN & QB & EX
+    CO --- RV
+    CO --- OI
+    CO -.- CI
 
-    Course ||--o{ Module : "compone"
-    Course ||--o{ ForumThread : "tiene"
-    Course ||--o{ Announcement : "publica"
-    Course ||--o{ Enrollment : "inscribe"
-    Course ||--o{ QuestionBank : "posee"
-    Course ||--o{ Exam : "evalua"
-    Course ||--o{ Review : "recibe"
-    Course ||--o{ CartItem : "agrega al carrito"
-    Course ||--o{ OrderItem : "vende"
+    MO --- LE
+    LE --- RE & LC & LP
 
-    Module ||--o{ Lesson : "contiene"
-    Lesson ||--o{ Resource : "adjunta"
-    Lesson ||--o{ LessonComment : "discute"
-    Lesson ||--o{ LessonProgress : "progresa"
+    FT --- FP
+    QB --- QO & EQ
+    EX --- EQ & EA
+    EA --- AA
+    AA --- QO
 
-    ForumThread ||--o{ ForumPost : "responde"
-    LessonComment ||--o{ LessonComment : "anida"
+    AC --- UA
+    EN --- CE
 
-    QuestionBank ||--o{ QuestionOption : "tiene"
-    QuestionBank ||--o{ ExamQuestion : "asigna"
-    Exam ||--o{ ExamQuestion : "incluye"
-    Exam ||--o{ ExamAttempt : "intenta"
-
-    ExamAttempt ||--o{ AttemptAnswer : "responde"
-    AttemptAnswer ||--o{ QuestionOption : "elige"
-
-    Achievement ||--o{ UserAchievement : "otorga"
-    Enrollment ||--o{ Certificate : "genera"
-
-    Cart ||--o{ CartItem : "contiene"
-    Coupon ||--o{ Order : "descuenta"
-    Order ||--o{ OrderItem : "detalla"
-    SupportTicket ||--o{ SupportMessage : "recibe"
+    CT --- CI
+    CP --- OD
+    OD --- OI
+    ST --- SM
 ```
 
 > 💡 **Nota:** También puedes visualizar el diagrama completo con campos en [dbdiagram.io](https://dbdiagram.io) importando el script [`dbdiagram.txt`](dbdiagram.txt).
