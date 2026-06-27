@@ -1,5 +1,6 @@
 import django_filters
-from apps.gamification.models import UserAchievement, Review
+
+from apps.gamification.models import Review, UserAchievement
 
 
 class UserAchievementFilter(django_filters.FilterSet):

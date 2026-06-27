@@ -1,31 +1,47 @@
 from django.utils.timezone import now
-from rest_framework import viewsets, status
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from apps.progress.models import (
-    Enrollment, LessonProgress, QuestionBank, QuestionOption,
-    Exam, ExamQuestion, ExamAttempt, AttemptAnswer, Certificate
-)
-from apps.progress.serializers import (
-    EnrollmentSerializer, EnrollmentWriteSerializer,
-    LessonProgressSerializer, LessonProgressWriteSerializer,
-    QuestionBankSerializer, QuestionBankWriteSerializer,
-    QuestionOptionSerializer,
-    ExamSerializer, ExamDetailSerializer, ExamWriteSerializer,
-    ExamQuestionSerializer,
-    ExamAttemptSerializer, ExamAttemptWriteSerializer,
-    AttemptAnswerSerializer,
-    CertificateSerializer
-)
-from apps.progress.filters import (
-    EnrollmentFilter, LessonProgressFilter, QuestionBankFilter,
-    ExamFilter, ExamAttemptFilter, CertificateFilter
-)
-from apps.progress.permissions import IsEnrolledOrAdmin, IsProfessorOfCourse
-from apps.users.permissions import IsAdminUser, IsProfessorOrAdmin
 from apps.email_helper import send_enrollment_email
+from apps.progress.filters import (
+    CertificateFilter,
+    EnrollmentFilter,
+    ExamAttemptFilter,
+    ExamFilter,
+    LessonProgressFilter,
+    QuestionBankFilter,
+)
+from apps.progress.models import (
+    AttemptAnswer,
+    Certificate,
+    Enrollment,
+    Exam,
+    ExamAttempt,
+    ExamQuestion,
+    LessonProgress,
+    QuestionBank,
+    QuestionOption,
+)
+from apps.progress.permissions import IsEnrolledOrAdmin
+from apps.progress.serializers import (
+    CertificateSerializer,
+    EnrollmentSerializer,
+    EnrollmentWriteSerializer,
+    ExamAttemptSerializer,
+    ExamAttemptWriteSerializer,
+    ExamDetailSerializer,
+    ExamQuestionSerializer,
+    ExamSerializer,
+    ExamWriteSerializer,
+    LessonProgressSerializer,
+    LessonProgressWriteSerializer,
+    QuestionBankSerializer,
+    QuestionBankWriteSerializer,
+    QuestionOptionSerializer,
+)
+from apps.users.permissions import IsAdminUser, IsProfessorOrAdmin
 
 
 class EnrollmentViewSet(viewsets.ModelViewSet):

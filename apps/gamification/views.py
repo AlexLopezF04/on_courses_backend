@@ -1,13 +1,15 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from apps.gamification.models import Achievement, UserAchievement, Review
-from apps.gamification.serializers import (
-    AchievementSerializer, UserAchievementSerializer,
-    ReviewSerializer, ReviewWriteSerializer
-)
-from apps.gamification.filters import UserAchievementFilter, ReviewFilter
+from apps.gamification.filters import ReviewFilter, UserAchievementFilter
+from apps.gamification.models import Achievement, Review, UserAchievement
 from apps.gamification.permissions import IsOwnerOrAdminForReview
+from apps.gamification.serializers import (
+    AchievementSerializer,
+    ReviewSerializer,
+    ReviewWriteSerializer,
+    UserAchievementSerializer,
+)
 from apps.users.permissions import IsAdminUser, IsProfessorOrAdmin
 
 
@@ -52,6 +54,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ('list', 'retrieve'):
             return [AllowAny()]
+        if self.action in ('update', 'partial_update', 'destroy'):
+            return [IsAuthenticated(), IsOwnerOrAdminForReview()]
         return [IsAuthenticated()]
 
     def perform_create(self, serializer):

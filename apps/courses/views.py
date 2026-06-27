@@ -1,14 +1,19 @@
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from apps.courses.models import Category, Course, Module, Lesson, Resource
-from apps.courses.serializers import (
-    CategorySerializer, CourseListSerializer, CourseDetailSerializer,
-    CourseWriteSerializer, ModuleSerializer, LessonSerializer,
-    LessonDetailSerializer, ResourceSerializer
-)
-from apps.courses.filters import CourseFilter, ModuleFilter, LessonFilter
+from apps.courses.filters import CourseFilter, LessonFilter, ModuleFilter
+from apps.courses.models import Category, Course, Lesson, Module, Resource
 from apps.courses.permissions import IsProfessorOrAdminForWrite, IsProfessorOwner
+from apps.courses.serializers import (
+    CategorySerializer,
+    CourseDetailSerializer,
+    CourseListSerializer,
+    CourseWriteSerializer,
+    LessonDetailSerializer,
+    LessonSerializer,
+    ModuleSerializer,
+    ResourceSerializer,
+)
 from apps.users.permissions import IsAdminUser
 
 

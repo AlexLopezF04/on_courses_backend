@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - run: uv sync --extra dev
+      - run: uv run ruff check
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - run: uv sync --extra dev
+      - run: uv run bandit -r apps config
+
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: on_courses_test_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.13"
+      - run: uv sync
+      - run: uv run python manage.py makemigrations --check
+        env:
+          DB_NAME: on_courses_test_db
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_HOST: localhost
+          SECRET_KEY: ci-test-key-not-for-prod
+          ALLOWED_HOSTS: localhost
+      - run: uv run python manage.py check
+        env:
+          DB_NAME: on_courses_test_db
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_HOST: localhost
+          SECRET_KEY: ci-test-key-not-for-prod
+          ALLOWED_HOSTS: localhost
+      - run: uv run python manage.py spectacular --file schema.yml --validate
+        env:
+          DB_NAME: on_courses_test_db
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_HOST: localhost
+          SECRET_KEY: ci-test-key-not-for-prod
+          ALLOWED_HOSTS: localhost
+      - run: uv run python manage.py test --verbosity=2
+        env:
+          DB_NAME: on_courses_test_db
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_HOST: localhost
+          SECRET_KEY: ci-test-key-not-for-prod
+          ALLOWED_HOSTS: localhost

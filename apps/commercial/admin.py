@@ -1,5 +1,14 @@
 from django.contrib import admin
-from apps.commercial.models import Cart, CartItem, Coupon, Order, OrderItem, SupportTicket, SupportMessage
+
+from apps.commercial.models import (
+    Cart,
+    CartItem,
+    Coupon,
+    Order,
+    OrderItem,
+    SupportMessage,
+    SupportTicket,
+)
 
 
 @admin.register(Cart)

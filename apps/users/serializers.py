@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from apps.users.models import User, StudentProfile, ProfessorProfile, AccessLog
+
+from apps.users.models import AccessLog, ProfessorProfile, StudentProfile, User
 
 
 class StudentProfileSerializer(serializers.ModelSerializer):

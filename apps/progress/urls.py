@@ -1,10 +1,15 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+
 from apps.progress.views import (
-    EnrollmentViewSet, LessonProgressViewSet,
-    QuestionBankViewSet, QuestionOptionViewSet,
-    ExamViewSet, ExamQuestionViewSet,
-    ExamAttemptViewSet, CertificateViewSet
+    CertificateViewSet,
+    EnrollmentViewSet,
+    ExamAttemptViewSet,
+    ExamQuestionViewSet,
+    ExamViewSet,
+    LessonProgressViewSet,
+    QuestionBankViewSet,
+    QuestionOptionViewSet,
 )
 
 router = DefaultRouter()

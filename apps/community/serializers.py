@@ -1,6 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
-from apps.community.models import ForumThread, ForumPost, Announcement, LessonComment
+
+from apps.community.models import Announcement, ForumPost, ForumThread, LessonComment
 
 
 class ForumPostSerializer(serializers.ModelSerializer):

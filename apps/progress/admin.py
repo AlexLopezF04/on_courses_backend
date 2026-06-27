@@ -1,7 +1,15 @@
 from django.contrib import admin
+
 from apps.progress.models import (
-    Enrollment, LessonProgress, QuestionBank, QuestionOption,
-    Exam, ExamQuestion, ExamAttempt, AttemptAnswer, Certificate
+    AttemptAnswer,
+    Certificate,
+    Enrollment,
+    Exam,
+    ExamAttempt,
+    ExamQuestion,
+    LessonProgress,
+    QuestionBank,
+    QuestionOption,
 )
 
 

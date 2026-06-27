@@ -1,6 +1,8 @@
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from apps.users.models import User
+
 from apps.courses.models import Course
+from apps.users.models import User
 
 
 class Achievement(models.Model):
@@ -69,6 +71,7 @@ class Review(models.Model):
         verbose_name='Curso'
     )
     rating = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
         verbose_name='Puntuación (1-5)'
     )
     comment = models.TextField(blank=True, verbose_name='Comentario')

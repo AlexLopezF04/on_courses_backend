@@ -1,4 +1,5 @@
 import django_filters
+
 from apps.users.models import User
 
 

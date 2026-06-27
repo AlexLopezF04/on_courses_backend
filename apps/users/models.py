@@ -34,6 +34,7 @@ class User(AbstractUser):
         db_table = 'usuarios'
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
+        ordering = ['username']
 
     def __str__(self):
         return f'{self.get_full_name() or self.username} ({self.get_role_display()})'

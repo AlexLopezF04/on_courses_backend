@@ -1,6 +1,7 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
-from apps.courses.models import Category, Course, Module, Lesson, Resource
+
+from apps.courses.models import Category, Course, Lesson, Module, Resource
 
 
 class CategorySerializer(serializers.ModelSerializer):

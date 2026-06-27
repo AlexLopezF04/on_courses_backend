@@ -1,7 +1,9 @@
 import uuid
+
 from django.db import models
+
+from apps.courses.models import Course, Lesson, Module
 from apps.users.models import User
-from apps.courses.models import Course, Module, Lesson
 
 
 class Enrollment(models.Model):

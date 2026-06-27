@@ -1,5 +1,6 @@
 import django_filters
-from apps.courses.models import Course, Module, Lesson
+
+from apps.courses.models import Course, Lesson, Module
 
 
 class CourseFilter(django_filters.FilterSet):

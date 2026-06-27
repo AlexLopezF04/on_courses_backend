@@ -1,16 +1,20 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from apps.community.models import ForumThread, ForumPost, Announcement, LessonComment
-from apps.community.serializers import (
-    ForumThreadSerializer, ForumThreadDetailSerializer, ForumThreadWriteSerializer,
-    ForumPostSerializer, ForumPostWriteSerializer,
-    AnnouncementSerializer, AnnouncementWriteSerializer,
-    LessonCommentSerializer, LessonCommentWriteSerializer
-)
-from apps.community.filters import ForumThreadFilter, AnnouncementFilter, LessonCommentFilter
+from apps.community.filters import AnnouncementFilter, ForumThreadFilter, LessonCommentFilter
+from apps.community.models import Announcement, ForumPost, ForumThread, LessonComment
 from apps.community.permissions import IsProfessorOrAdminForAnnouncement
-from apps.users.permissions import IsOwnerOrAdmin
+from apps.community.serializers import (
+    AnnouncementSerializer,
+    AnnouncementWriteSerializer,
+    ForumPostSerializer,
+    ForumPostWriteSerializer,
+    ForumThreadDetailSerializer,
+    ForumThreadSerializer,
+    ForumThreadWriteSerializer,
+    LessonCommentSerializer,
+    LessonCommentWriteSerializer,
+)
 
 
 class ForumThreadViewSet(viewsets.ModelViewSet):

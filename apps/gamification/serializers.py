@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from apps.gamification.models import Achievement, UserAchievement, Review
+
+from apps.gamification.models import Achievement, Review, UserAchievement
 
 
 class AchievementSerializer(serializers.ModelSerializer):
@@ -34,3 +35,12 @@ class ReviewWriteSerializer(serializers.ModelSerializer):
         if value < 1 or value > 5:
             raise serializers.ValidationError('La puntuación debe estar entre 1 y 5')
         return value
+
+    def validate(self, data):
+        user = self.context['request'].user
+        course = data.get('course')
+        if course and Review.objects.filter(user=user, course=course).exists():
+            raise serializers.ValidationError(
+                'Ya has calificado este curso anteriormente'
+            )
+        return data

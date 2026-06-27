@@ -1,17 +1,17 @@
-from rest_framework import viewsets, status, generics
+from drf_spectacular.utils import extend_schema
+from rest_framework import generics, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
-from apps.users.models import User
-from apps.users.serializers import (
-    UserSerializer, UserWriteSerializer, RegisterSerializer
-)
-from apps.users.filters import UserFilter
-from apps.users.permissions import IsOwnerOrAdmin, IsAdminUser
 from apps.email_helper import send_welcome_email
+from apps.users.filters import UserFilter
+from apps.users.models import User
+from apps.users.permissions import IsAdminUser, IsOwnerOrAdmin
+from apps.users.serializers import RegisterSerializer, UserSerializer, UserWriteSerializer
 
 
+@extend_schema(request=None, responses={200: None})
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def health_check(request):

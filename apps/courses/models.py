@@ -1,4 +1,5 @@
 from django.db import models
+
 from apps.users.models import User
 
 
@@ -12,6 +13,7 @@ class Category(models.Model):
         db_table = 'categorias'
         verbose_name = 'Categoría'
         verbose_name_plural = 'Categorías'
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -53,6 +55,7 @@ class Course(models.Model):
         db_table = 'cursos'
         verbose_name = 'Curso'
         verbose_name_plural = 'Cursos'
+        ordering = ['-created_at']
 
     def __str__(self):
         return self.title

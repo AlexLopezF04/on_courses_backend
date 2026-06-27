@@ -1,5 +1,6 @@
 import django_filters
-from apps.community.models import ForumThread, Announcement, LessonComment
+
+from apps.community.models import Announcement, ForumThread, LessonComment
 
 
 class ForumThreadFilter(django_filters.FilterSet):

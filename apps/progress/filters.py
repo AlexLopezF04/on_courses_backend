@@ -1,6 +1,12 @@
 import django_filters
+
 from apps.progress.models import (
-    Enrollment, LessonProgress, QuestionBank, Exam, ExamAttempt, Certificate
+    Certificate,
+    Enrollment,
+    Exam,
+    ExamAttempt,
+    LessonProgress,
+    QuestionBank,
 )
 
 

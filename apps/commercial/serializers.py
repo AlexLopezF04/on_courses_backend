@@ -1,6 +1,14 @@
 from rest_framework import serializers
-from apps.commercial.models import Cart, CartItem, Coupon, Order, OrderItem, SupportTicket, SupportMessage
-from apps.courses.models import Course
+
+from apps.commercial.models import (
+    Cart,
+    CartItem,
+    Coupon,
+    Order,
+    OrderItem,
+    SupportMessage,
+    SupportTicket,
+)
 
 
 class CartItemSerializer(serializers.ModelSerializer):

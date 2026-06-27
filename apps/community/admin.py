@@ -1,5 +1,6 @@
 from django.contrib import admin
-from apps.community.models import ForumThread, ForumPost, Announcement, LessonComment
+
+from apps.community.models import Announcement, ForumPost, ForumThread, LessonComment
 
 
 @admin.register(ForumThread)

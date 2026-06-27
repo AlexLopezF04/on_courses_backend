@@ -1,5 +1,6 @@
 from django.contrib import admin
-from apps.gamification.models import Achievement, UserAchievement, Review
+
+from apps.gamification.models import Achievement, Review, UserAchievement
 
 
 @admin.register(Achievement)

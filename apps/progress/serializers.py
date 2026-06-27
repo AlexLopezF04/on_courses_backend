@@ -1,8 +1,16 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
+
 from apps.progress.models import (
-    Enrollment, LessonProgress, QuestionBank, QuestionOption,
-    Exam, ExamQuestion, ExamAttempt, AttemptAnswer, Certificate
+    AttemptAnswer,
+    Certificate,
+    Enrollment,
+    Exam,
+    ExamAttempt,
+    ExamQuestion,
+    LessonProgress,
+    QuestionBank,
+    QuestionOption,
 )
 
 
@@ -75,15 +83,18 @@ class ExamSerializer(serializers.ModelSerializer):
 
 class ExamDetailSerializer(serializers.ModelSerializer):
     """Serializer detallado que incluye las preguntas con sus opciones."""
-    questions = QuestionBankSerializer(
-        source='exam_questions__question',
-        many=True,
-        read_only=True
-    )
+    questions = serializers.SerializerMethodField()
 
     class Meta:
         model = Exam
         fields = '__all__'
+
+    @extend_schema_field(serializers.ListField())
+    def get_questions(self, obj):
+        questions = QuestionBank.objects.filter(
+            exam_questions__exam=obj
+        ).prefetch_related('options')
+        return QuestionBankSerializer(questions, many=True).data
 
 
 class ExamWriteSerializer(serializers.ModelSerializer):

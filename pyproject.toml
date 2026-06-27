@@ -1,7 +1,7 @@
 [project]
 name = "on-courses-backend"
 version = "0.1.0"
-description = "Add your description here"
+description = "Plataforma de cursos online en tecnología"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -11,7 +11,28 @@ dependencies = [
     "djangorestframework>=3.17.1",
     "djangorestframework-simplejwt>=5.5.1",
     "drf-spectacular>=0.29.0",
+    "gunicorn>=26.0.0",
     "pillow>=12.2.0",
-    "psycopg2>=2.9.12",
+    "psycopg2-binary>=2.9.12",
     "python-decouple>=3.8",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.11.0",
+    "bandit>=1.8.0",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/migrations/*" = ["ALL"]
+"**/tests/*" = ["ALL"]
+
+[tool.bandit]
+exclude_dirs = ["migrations", "tests"]

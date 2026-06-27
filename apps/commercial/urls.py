@@ -1,8 +1,12 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
+
 from apps.commercial.views import (
-    CartViewSet, CartItemViewSet, CouponViewSet,
-    OrderViewSet, SupportTicketViewSet
+    CartItemViewSet,
+    CartViewSet,
+    CouponViewSet,
+    OrderViewSet,
+    SupportTicketViewSet,
 )
 
 router = DefaultRouter()

@@ -1,8 +1,7 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from apps.gamification.views import (
-    AchievementViewSet, UserAchievementViewSet, ReviewViewSet
-)
+
+from apps.gamification.views import AchievementViewSet, ReviewViewSet, UserAchievementViewSet
 
 router = DefaultRouter()
 router.register(r'achievements', AchievementViewSet)

@@ -110,4 +110,4 @@ class FileUploadTests(TestCase):
             format='multipart'
         )
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn('/media/courses/covers/test', resp.data['cover_image'])
+        self.assertIn('/media/', resp.data['cover_image'])

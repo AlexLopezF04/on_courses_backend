@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission, SAFE_METHODS
+from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 
 class IsProfessorOwner(BasePermission):
@@ -6,11 +6,15 @@ class IsProfessorOwner(BasePermission):
     Permite modificar solo los cursos que le pertenecen al profesor.
     Los administradores pueden modificar cualquier curso.
     """
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return request.user.role in ('professor', 'admin')
+
     def has_object_permission(self, request, view, obj):
         if request.user.role == 'admin':
             return True
         if request.user.role == 'professor':
-            # Verifica si el objeto tiene 'professor' o 'course.professor'
             professor = getattr(obj, 'professor', None)
             if professor is None:
                 course = getattr(obj, 'course', None)
