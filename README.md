@@ -83,13 +83,46 @@ on_courses_backend/
 
 ```mermaid
 erDiagram
+    User {}
+    StudentProfile {}
+    ProfessorProfile {}
+    AccessLog {}
+    Category {}
+    Course {}
+    Module {}
+    Lesson {}
+    Resource {}
+    ForumThread {}
+    ForumPost {}
+    Announcement {}
+    LessonComment {}
+    Enrollment {}
+    LessonProgress {}
+    QuestionBank {}
+    QuestionOption {}
+    Exam {}
+    ExamQuestion {}
+    ExamAttempt {}
+    AttemptAnswer {}
+    Certificate {}
+    Achievement {}
+    UserAchievement {}
+    Review {}
+    Cart {}
+    CartItem {}
+    Coupon {}
+    Order {}
+    OrderItem {}
+    SupportTicket {}
+    SupportMessage {}
+
     User ||--o{ StudentProfile : "tiene"
     User ||--o{ ProfessorProfile : "tiene"
     User ||--o{ AccessLog : "registra"
     User ||--o{ ForumThread : "crea"
     User ||--o{ ForumPost : "publica"
     User ||--o{ LessonComment : "comenta"
-    User ||--o{ Enrollment : "se inscribe"
+    User ||--o{ Enrollment : "inscribe"
     User ||--o{ LessonProgress : "avanza"
     User ||--o{ ExamAttempt : "intenta"
     User ||--o{ Certificate : "obtiene"
@@ -110,30 +143,30 @@ erDiagram
     Course ||--o{ QuestionBank : "posee"
     Course ||--o{ Exam : "evalua"
     Course ||--o{ Review : "recibe"
-    Course ||--o{ CartItem : "agregado al carrito"
-    Course ||--o{ OrderItem : "vendido"
+    Course ||--o{ CartItem : "agrega al carrito"
+    Course ||--o{ OrderItem : "vende"
 
     Module ||--o{ Lesson : "contiene"
     Lesson ||--o{ Resource : "adjunta"
     Lesson ||--o{ LessonComment : "discute"
-    Lesson ||--o{ LessonProgress : "progreso"
+    Lesson ||--o{ LessonProgress : "progresa"
 
     ForumThread ||--o{ ForumPost : "responde"
-    LessonComment ||--o{ LessonComment : "responde a"
+    LessonComment ||--o{ LessonComment : "anida"
 
-    QuestionBank ||--o{ QuestionOption : "opciones"
-    QuestionBank ||--o{ ExamQuestion : "asignada a"
+    QuestionBank ||--o{ QuestionOption : "tiene"
+    QuestionBank ||--o{ ExamQuestion : "asigna"
     Exam ||--o{ ExamQuestion : "incluye"
-    Exam ||--o{ ExamAttempt : "intentado"
+    Exam ||--o{ ExamAttempt : "intenta"
 
     ExamAttempt ||--o{ AttemptAnswer : "responde"
-    AttemptAnswer ||--o{ QuestionOption : "selecciona"
+    AttemptAnswer ||--o{ QuestionOption : "elige"
 
-    Achievement ||--o{ UserAchievement : "otorgado"
+    Achievement ||--o{ UserAchievement : "otorga"
     Enrollment ||--o{ Certificate : "genera"
 
     Cart ||--o{ CartItem : "contiene"
-    Coupon ||--o{ Order : "aplica descuento"
+    Coupon ||--o{ Order : "descuenta"
     Order ||--o{ OrderItem : "detalla"
     SupportTicket ||--o{ SupportMessage : "recibe"
 ```
