@@ -1,8 +1,9 @@
 from drf_spectacular.utils import extend_schema
-from rest_framework import generics, status, viewsets
+from rest_framework import APIView, generics, status, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.email_helper import send_welcome_email
 from apps.users.filters import UserFilter
@@ -63,3 +64,24 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.action == 'destroy':
             return [IsAdminUser()]
         return [IsAdminUser()]
+
+class LogoutView(APIView):
+    """Cierra sesión e invalida el token refresh."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data["refresh"]
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except KeyError:
+            return Response(
+                {"error": "Se requiere el token refresh"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception:
+            return Response(
+                {"error": "Token inválido o ya expirado"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
