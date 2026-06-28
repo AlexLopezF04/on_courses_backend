@@ -35,6 +35,12 @@
 
 **OnCourses** es una plataforma de cursos online enfocada en tecnología. Este repositorio contiene el **backend** completo desarrollado con Django y Django REST Framework, diseñado para ser consumido por aplicaciones web (React/Next.js) y móviles (Flutter/React Native).
 
+### 👥 Integrantes
+
+| Nombre | Rol |
+|--------|-----|
+| **Alex López Fuentes** | Desarrollador Full Stack — Diseño, desarrollo, pruebas y despliegue |
+
 ### ✨ Funcionalidades Principales
 
 <div align="center">
