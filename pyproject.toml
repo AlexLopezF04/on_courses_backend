@@ -26,6 +26,7 @@ dev = [
 [tool.ruff]
 target-version = "py313"
 line-length = 100
+extend-exclude = ["postman_collection.json", "*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP"]

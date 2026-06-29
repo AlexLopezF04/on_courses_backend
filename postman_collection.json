@@ -1,13 +1,13 @@
 {
   "info": {
     "name": "OnCourses API",
-    "description": "API REST de plataforma de cursos online de tecnología\n\n## Autenticación\n1. Usa `POST /api/auth/register/` para crear un usuario\n2. Usa `POST /api/auth/login/` para obtener tokens\n3. La variable `auth_token` se asigna automáticamente via Tests en Login\n\n## Variables de entorno recomendadas\n- `base_url`: `http://localhost:8000` (local) o tu URL de producción\n- `auth_token`: se llena automáticamente",
+    "description": "API REST de plataforma de cursos online de tecnología\n\n## Autenticación\n1. Usa `POST /api/auth/register/` para crear un usuario\n2. Usa `POST /api/auth/login/` para obtener tokens\n3. `auth_token` y `refresh_token` se asignan automáticamente\n\n## Variables de entorno\n- `base_url`: Cambiar según entorno\n  - Local: `http://localhost:8000`\n  - Producción: `https://on-courses-api.uaeftt-ute.site`\n- `auth_token`: se llena automáticamente al hacer Login\n- `refresh_token`: se llena automáticamente al hacer Login",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
       "name": "1. Auth",
-      "description": "Autenticación JWT: registro, login, refresh",
+      "description": "Autenticación JWT: registro, login, refresh y logout",
       "item": [
         {
           "name": "Health Check",
@@ -27,7 +27,20 @@
               "mode": "raw",
               "raw": "{\n  \"username\": \"estudiante1\",\n  \"email\": \"estudiante1@test.com\",\n  \"password\": \"Pass1234!\",\n  \"password_confirm\": \"Pass1234!\",\n  \"first_name\": \"Carlos\",\n  \"last_name\": \"López\"\n}"
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    pm.test('Usuario registrado exitosamente', () => true);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         },
         {
           "name": "Login",
@@ -64,7 +77,52 @@
               "mode": "raw",
               "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.access) {",
+                  "    pm.collectionVariables.set('auth_token', jsonData.access);",
+                  "    pm.collectionVariables.set('refresh_token', jsonData.refresh);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/logout/",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{auth_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 204) {",
+                  "    pm.collectionVariables.set('auth_token', '');",
+                  "    pm.collectionVariables.set('refresh_token', '');",
+                  "    pm.test('Sesión cerrada - token blacklisteado', () => true);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         }
       ]
     },
@@ -73,7 +131,7 @@
       "description": "CRUD de usuarios (admin para list, owner/admin para retrieve/update)",
       "item": [
         {
-          "name": "List Users (admin)",
+          "name": "List Users (admin only)",
           "request": {
             "method": "GET",
             "url": "{{base_url}}/api/users/",
@@ -155,6 +213,14 @@
               }
             },
             {
+              "name": "List Courses (Page 2 - Pagination)",
+              "request": {
+                "method": "GET",
+                "url": "{{base_url}}/api/courses/?page=2",
+                "description": "Muestra la paginación en acción. La respuesta incluye count, next, previous y results."
+              }
+            },
+            {
               "name": "Search Courses",
               "request": {
                 "method": "GET",
@@ -207,9 +273,10 @@
                 "body": {
                   "mode": "formdata",
                   "formdata": [
-                    {"key": "cover_image", "type": "file", "src": "/path/to/image.png"}
+                    {"key": "cover_image", "type": "file", "src": "/ruta/a/tu/imagen.png"}
                   ]
-                }
+                },
+                "description": "Reemplaza '/ruta/a/tu/imagen.png' por la ruta real de una imagen en tu computadora."
               }
             },
             {
@@ -283,10 +350,11 @@
                   "formdata": [
                     {"key": "lesson", "value": "1"},
                     {"key": "title", "value": "Guía PDF"},
-                    {"key": "file", "type": "file", "src": "/path/to/file.pdf"},
+                    {"key": "file", "type": "file", "src": "/ruta/a/tu/archivo.pdf"},
                     {"key": "resource_type", "value": "pdf"}
                   ]
-                }
+                },
+                "description": "Reemplaza '/ruta/a/tu/archivo.pdf' por la ruta real de un archivo en tu computadora."
               }
             }
           ]
@@ -575,6 +643,63 @@
             "method": "GET",
             "url": "{{base_url}}/api/schema/"
           }
+        }
+      ]
+    },
+    {
+      "name": "9. Pruebas de Permisos",
+      "description": "Verificación de control de acceso por roles",
+      "item": [
+        {
+          "name": "401 - Sin token (Unauthorized)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/users/1/",
+            "description": "Debe responder con 401 Unauthorized porque no se envía token de autenticación."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe ser 401 Unauthorized', () => {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test('Mensaje de error de autenticación', () => {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.detail).to.include('Authentication credentials');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "403 - Sin permisos de admin (Forbidden)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/users/1/",
+            "header": [{"key": "Authorization", "value": "Bearer {{auth_token}}"}],
+            "description": "Debe responder con 403 Forbidden si el token es de un estudiante/profesor intentando eliminar un usuario (acción solo admin)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Debe ser 403 Forbidden', () => {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "pm.test('Mensaje de permiso denegado', () => {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.detail).to.include('permission');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         }
       ]
     }
