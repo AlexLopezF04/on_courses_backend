@@ -2,7 +2,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-from apps.users.views import RegisterView, UserViewSet, health_check, LogoutView
+from apps.users.views import LogoutView, RegisterView, UserViewSet, health_check
 
 router = DefaultRouter()
 router.register(r'users', UserViewSet)

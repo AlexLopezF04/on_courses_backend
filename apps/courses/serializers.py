@@ -13,7 +13,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
-        exclude = ['course']
+        fields = '__all__'
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class LessonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Lesson
-        exclude = ['module']
+        fields = '__all__'
 
 
 class LessonDetailSerializer(serializers.ModelSerializer):
