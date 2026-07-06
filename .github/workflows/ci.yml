@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.13"
       - run: uv sync --extra dev
-      - run: uv run bandit -r apps config --skip B105,B106,B107
+      - run: uv run bandit -r courses config --skip B105,B106,B107
 
   test:
     runs-on: ubuntu-latest

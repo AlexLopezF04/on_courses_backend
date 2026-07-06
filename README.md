@@ -60,7 +60,7 @@
 
 ## 🏗 Arquitectura
 
-El proyecto sigue una **arquitectura modular** basada en 6 aplicaciones Django independientes:
+El proyecto sigue una **arquitectura consolidada** en una única aplicación Django (`courses`):
 
 ```
 on_courses_backend/
@@ -69,13 +69,16 @@ on_courses_backend/
 │   ├── urls.py              # Enrutador principal
 │   ├── wsgi.py              # Entry point para Gunicorn
 │   └── pagination.py        # Paginación personalizada
-├── apps/
-│   ├── users/               # Módulo 1: Usuarios (4 tablas)
-│   ├── courses/             # Módulo 2: Cursos (5 tablas)
-│   ├── community/           # Módulo 3: Comunidad (4 tablas)
-│   ├── progress/            # Módulo 4: Progreso (9 tablas)
-│   ├── gamification/        # Módulo 5: Gamificación (3 tablas)
-│   └── commercial/          # Módulo 6: Comercial (7 tablas)
+├── courses/                 # Aplicación principal (toda la lógica)
+│   ├── models/              # 26 modelos organizados por entidad
+│   ├── views/               # ViewSets por dominio
+│   ├── serializers/         # Serializers por dominio
+│   ├── tests/               # Tests por módulo
+│   ├── migrations/          # Migraciones de base de datos
+│   ├── admin.py             # Panel de administración
+│   ├── filters.py           # Filtros de búsqueda
+│   ├── permissions.py       # Permisos personalizados
+│   └── urls.py              # Router de endpoints
 ├── .env                     # Variables de entorno
 ├── manage.py                # CLI de Django
 └── pyproject.toml           # Dependencias (uv)
@@ -85,16 +88,15 @@ on_courses_backend/
 
 ## 🗄 Modelo de Datos
 
-**32 tablas** distribuidas en 6 módulos, más 11 tablas del framework Django = **43 tablas en PostgreSQL**.
+**26 tablas propias** + tablas del framework Django (auth, sessions, token_blacklist).
+
+> 💡 **Fusión de tablas**: Se consolidaron 6 tablas en campos JSONField o campos directos para simplificar la arquitectura (perfiles de usuario, opciones de preguntas, respuestas de intentos, mensajes de soporte).
 
 ```
 📦 on_courses_db (PostgreSQL 16)
 │
-├── 👤 Usuarios (4)
-│   ├── User
-│   ├── StudentProfile
-│   ├── ProfessorProfile
-│   └── AccessLog
+├── 👤 Usuarios (1)
+│   └── User  ← incluye campos de perfil de estudiante y profesor
 │
 ├── 📚 Cursos (5)
 │   ├── Category
@@ -109,15 +111,13 @@ on_courses_backend/
 │   ├── Announcement
 │   └── LessonComment
 │
-├── 📈 Progreso (9)
+├── 📈 Progreso (8)
 │   ├── Enrollment
 │   ├── LessonProgress
-│   ├── QuestionBank
-│   ├── QuestionOption
+│   ├── QuestionBank  ← opciones de respuesta como JSONField
 │   ├── Exam
 │   ├── ExamQuestion
-│   ├── ExamAttempt
-│   ├── AttemptAnswer
+│   ├── ExamAttempt   ← respuestas del intento como JSONField
 │   └── Certificate
 │
 ├── 🏆 Gamificación (3)
@@ -125,17 +125,22 @@ on_courses_backend/
 │   ├── UserAchievement
 │   └── Review
 │
-└── 🛒 Comercial (7)
+└── 🛒 Comercial (5)
     ├── Cart
     ├── CartItem
     ├── Coupon
     ├── Order
     ├── OrderItem
-    ├── SupportTicket
-    └── SupportMessage
+    └── SupportTicket ← mensajes del ticket como JSONField
 ```
 
-> 💡 También puedes visualizar el diagrama interactivo en [dbdiagram.io](https://dbdiagram.io) importando [`dbdiagram.txt`](dbdiagram.txt).
+### Campos JSONField consolidados
+
+| Modelo | Campo JSON | Descripción |
+|---|---|---|
+| `QuestionBank` | `options` | `[{"text": "...", "is_correct": true}]` |
+| `ExamAttempt` | `answers` | `[{"question_id": 1, "option_index": 0, "is_correct": true}]` |
+| `SupportTicket` | `messages` | `[{"sender_id": 1, "sender_name": "...", "message": "...", "sent_at": "ISO"}]` |
 
 ---
 
@@ -155,14 +160,15 @@ git clone https://github.com/AlexLopezF04/on_courses_backend.git
 cd on_courses_backend
 
 # 2. Crear la base de datos en PostgreSQL
-psql -U postgres
-CREATE DATABASE nombre_bd;
-CREATE USER nombre_usuario WITH PASSWORD 'tu_contraseña_segura';
-ALTER ROLE nombre_usuario SET client_encoding TO 'utf8';
-ALTER ROLE nombre_usuario SET default_transaction_isolation TO 'read committed';
-ALTER ROLE nombre_usuario SET timezone TO 'UTC';
-GRANT ALL PRIVILEGES ON DATABASE nombre_bd TO nombre_usuario;
-ALTER USER nombre_usuario CREATEDB;
+# Linux/macOS:
+sudo -u postgres psql
+# Windows: abrir psql desde el menú de inicio o pgAdmin
+
+# Dentro de la consola psql:
+CREATE USER on_courses_user WITH PASSWORD 'on_courses_pass';
+CREATE DATABASE on_courses_db OWNER on_courses_user;
+GRANT ALL PRIVILEGES ON DATABASE on_courses_db TO on_courses_user;
+ALTER USER on_courses_user CREATEDB;
 \q
 
 # 3. Configurar variables de entorno
@@ -207,13 +213,21 @@ EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend
 ### Ejecutar Tests
 
 ```bash
-# Todos los tests
-uv run python manage.py test
+# Suite completa
+uv run python manage.py test courses
 
-# Tests por módulo
-uv run python manage.py test apps.users.tests
-uv run python manage.py test apps.courses.tests
-uv run python manage.py test apps.progress.tests
+# Por módulo
+uv run python manage.py test courses.tests.test_auth
+uv run python manage.py test courses.tests.test_users
+uv run python manage.py test courses.tests.test_categories
+uv run python manage.py test courses.tests.test_products
+uv run python manage.py test courses.tests.test_orders
+
+# Un test específico
+uv run python manage.py test courses.tests.test_orders.OrderCRUDTests.test_create_empty_order
+
+# Con detalle de cada test
+uv run python manage.py test courses --verbosity=2
 ```
 
 ---
@@ -435,11 +449,11 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Acceder a PostgreSQL
 sudo -u postgres psql
 
-# Crear base de datos y usuario
-CREATE DATABASE nombre_bd;
-CREATE USER nombre_usuario WITH PASSWORD 'tu_contraseña_segura';
-GRANT ALL PRIVILEGES ON DATABASE nombre_bd TO nombre_usuario;
-ALTER USER nombre_usuario CREATEDB;
+# Crear base de datos y usuario (mismas credenciales del .env)
+CREATE USER on_courses_user WITH PASSWORD 'on_courses_pass';
+CREATE DATABASE on_courses_db OWNER on_courses_user;
+GRANT ALL PRIVILEGES ON DATABASE on_courses_db TO on_courses_user;
+ALTER USER on_courses_user CREATEDB;
 \q
 ```
 
