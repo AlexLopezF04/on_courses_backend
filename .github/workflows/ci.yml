@@ -1,33 +1,46 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
     branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
 
 jobs:
-  lint:
+  # -------------------------------------------------------------
+  # Job 1: Calidad de Código (QA - Linting, Formateo y Seguridad)
+  # -------------------------------------------------------------
+  qa:
+    name: Calidad de Código (Linter, Formateo y Seguridad)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - name: Descargar Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python y uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.13"
-      - run: uv sync --extra dev
-      - run: uv run ruff check
+          enable-cache: true
 
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
-        with:
-          python-version: "3.13"
-      - run: uv sync --extra dev
-      - run: uv run bandit -r courses config --skip B105,B106,B107
+      - name: Sincronizar Dependencias
+        run: uv sync --extra dev
 
+      - name: Verificar Estilo de Código (Ruff)
+        run: uv run ruff check
+
+      - name: Verificar Formato de Código (Ruff Formatter)
+        run: uv run ruff format --check
+
+      - name: Análisis de Seguridad (Bandit)
+        run: uv run bandit -r courses config --skip B105,B106,B107
+
+  # -------------------------------------------------------------
+  # Job 2: Pruebas Unitarias e Integridad (Tests)
+  # -------------------------------------------------------------
   test:
+    name: Pruebas Unitarias
+    needs: qa
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -52,12 +65,51 @@ jobs:
       ALLOWED_HOSTS: localhost
       SECURE_SSL_REDIRECT: false
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - name: Descargar Código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python y uv
+        uses: astral-sh/setup-uv@v5
         with:
           python-version: "3.13"
-      - run: uv sync
-      - run: uv run python manage.py makemigrations --check
-      - run: uv run python manage.py check
-      - run: uv run python manage.py spectacular --file schema.yml --validate
-      - run: uv run python manage.py test --verbosity=2
+          enable-cache: true
+
+      - name: Sincronizar Dependencias
+        run: uv sync
+
+      - name: Validar Configuración de Django (Check)
+        run: uv run python manage.py check
+
+      - name: Verificar Migraciones Faltantes
+        run: uv run python manage.py makemigrations --check
+
+      - name: Validar Esquema OpenAPI (Spectacular)
+        run: uv run python manage.py spectacular --file schema.yml --validate
+
+      - name: Ejecutar Pruebas Unitarias
+        run: uv run python manage.py test courses --verbosity=2
+
+  # -------------------------------------------------------------
+  # Job 3: Despliegue Continuo (CD) - Opcional
+  # -------------------------------------------------------------
+  deploy:
+    name: Despliegue en Producción
+    needs: test
+    runs-on: ubuntu-latest
+    # Se ejecuta solo si es un push a la rama main (no PRs ni otras ramas)
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Descargar Código
+        uses: actions/checkout@v4
+
+      - name: Ejecutar Script de Despliegue vía SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: ${{ secrets.DEPLOY_PORT || 22 }}
+          script: |
+            chmod +x /var/www/on_courses_backend/deploy.sh
+            /var/www/on_courses_backend/deploy.sh
+
