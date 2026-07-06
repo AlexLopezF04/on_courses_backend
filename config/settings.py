@@ -17,11 +17,11 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv())
 # on_courses maneja 3 roles: Estudiante, Profesor, Administrador.
 # Definimos un modelo User abstracto con role, y perfiles específicos.
 # =============================================================================
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'courses.User'
 
 # =============================================================================
 # APLICACIONES DEL PROYECTO
-# Organizadas en 6 módulos funcionales (apps modulares) dentro de apps/
+# Organizadas en la app unificada courses/
 # =============================================================================
 INSTALLED_APPS = [
     # Django core
@@ -40,13 +40,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
 
-    # Apps de on_courses (ordenadas por dominio)
-    'apps.users',
-    'apps.courses',
-    'apps.community',
-    'apps.progress',
-    'apps.gamification',
-    'apps.commercial',
+    # App unificada de on_courses
+    'courses',
 ]
 
 # =============================================================================
