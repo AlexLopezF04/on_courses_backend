@@ -4,20 +4,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('courses', '0001_initial'),
+        ("courses", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='examattempt',
-            name='answers',
-            field=models.JSONField(default=list, help_text='Lista: [{"question_id": 1, "option_index": 0, "is_correct": true}]', verbose_name='Respuestas del intento'),
+            model_name="examattempt",
+            name="answers",
+            field=models.JSONField(
+                default=list,
+                help_text='Lista: [{"question_id": 1, "option_index": 0, "is_correct": true}]',
+                verbose_name="Respuestas del intento",
+            ),
         ),
         migrations.AlterField(
-            model_name='supportticket',
-            name='messages',
-            field=models.JSONField(default=list, help_text='Lista: [{"sender_id": 1, "message": "...", "sent_at": "ISO"}]', verbose_name='Mensajes del ticket'),
+            model_name="supportticket",
+            name="messages",
+            field=models.JSONField(
+                default=list,
+                help_text='Lista: [{"sender_id": 1, "message": "...", "sent_at": "ISO"}]',
+                verbose_name="Mensajes del ticket",
+            ),
         ),
     ]
