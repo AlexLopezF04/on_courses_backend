@@ -10,3 +10,4 @@ media/
 staticfiles/
 guia_estudio.md
 guia_postman.md 
+.ruff_cache
