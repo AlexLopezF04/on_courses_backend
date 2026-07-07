@@ -8,17 +8,18 @@ from courses.serializers import LessonCommentSerializer, LessonCommentWriteSeria
 
 class LessonCommentViewSet(viewsets.ModelViewSet):
     """CRUD de comentarios en lecciones. Soporta respuestas anidadas."""
+
     queryset = LessonComment.objects.all()
     filterset_class = LessonCommentFilter
-    ordering_fields = ['created_at']
+    ordering_fields = ["created_at"]
 
     def get_serializer_class(self):
-        if self.action in ('create', 'update', 'partial_update'):
+        if self.action in ("create", "update", "partial_update"):
             return LessonCommentWriteSerializer
         return LessonCommentSerializer
 
     def get_permissions(self):
-        if self.action in ('list', 'retrieve'):
+        if self.action in ("list", "retrieve"):
             return [AllowAny()]
         return [IsAuthenticated()]
 

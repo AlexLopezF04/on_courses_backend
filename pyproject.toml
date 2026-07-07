@@ -34,6 +34,7 @@ select = ["E", "F", "W", "I", "N", "UP"]
 [tool.ruff.lint.per-file-ignores]
 "**/migrations/*" = ["ALL"]
 "**/tests/*" = ["ALL"]
+"**/__init__.py" = ["F401"]
 
 [tool.bandit]
 exclude_dirs = ["migrations", "tests"]

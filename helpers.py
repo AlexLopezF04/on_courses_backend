@@ -5,25 +5,21 @@ from rest_framework_simplejwt.tokens import RefreshToken
 User = get_user_model()
 
 
-def create_user(username='student', password='Pass1234!', role='student', **kwargs):  # nosec
+def create_user(username="student", password="Pass1234!", role="student", **kwargs):  # nosec
     """Crea un usuario de prueba con el rol especificado."""
     return User.objects.create_user(
-        username=username,
-        email=f'{username}@test.com',
-        password=password,
-        role=role,
-        **kwargs
+        username=username, email=f"{username}@test.com", password=password, role=role, **kwargs
     )
 
 
-def create_professor(username='prof', password='Pass1234!'):  # nosec
+def create_professor(username="prof", password="Pass1234!"):  # nosec
     """Crea un profesor de prueba."""
-    return create_user(username=username, password=password, role='professor')
+    return create_user(username=username, password=password, role="professor")
 
 
-def create_admin(username='admin', password='Pass1234!'):  # nosec
+def create_admin(username="admin", password="Pass1234!"):  # nosec
     """Crea un administrador de prueba."""
-    return create_user(username=username, password=password, role='admin')
+    return create_user(username=username, password=password, role="admin")
 
 
 def get_tokens(user):
@@ -36,7 +32,7 @@ def auth_client(user):
     """Retorna un APIClient autenticado con JWT."""
     client = APIClient()
     access, _ = get_tokens(user)
-    client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
+    client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
     return client
 
 

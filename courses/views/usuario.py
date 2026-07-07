@@ -16,21 +16,22 @@ class UserViewSet(viewsets.ModelViewSet):
     - Update: dueño del perfil o admin
     - Delete: solo administradores
     """
+
     queryset = User.objects.all()
     filterset_class = UserFilter
-    search_fields = ['username', 'email', 'first_name', 'last_name']
-    ordering_fields = ['username', 'email', 'date_joined']
+    search_fields = ["username", "email", "first_name", "last_name"]
+    ordering_fields = ["username", "email", "date_joined"]
 
     def get_serializer_class(self):
-        if self.action in ('create', 'update', 'partial_update'):
+        if self.action in ("create", "update", "partial_update"):
             return UserWriteSerializer
         return UserSerializer
 
     def get_permissions(self):
-        if self.action == 'retrieve':
+        if self.action == "retrieve":
             return [IsAuthenticated(), IsOwnerOrAdmin()]
-        if self.action in ('update', 'partial_update'):
+        if self.action in ("update", "partial_update"):
             return [IsAuthenticated(), IsOwnerOrAdmin()]
-        if self.action == 'destroy':
+        if self.action == "destroy":
             return [IsAdminUser()]
         return [IsAdminUser()]

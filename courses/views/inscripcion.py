@@ -2,28 +2,29 @@ from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from email_helper import send_enrollment_email
 from courses.filters import EnrollmentFilter
 from courses.models import Enrollment
-from courses.permissions import IsEnrolledOrAdmin, IsAdminUser
+from courses.permissions import IsAdminUser, IsEnrolledOrAdmin
 from courses.serializers import EnrollmentSerializer, EnrollmentWriteSerializer
+from email_helper import send_enrollment_email
 
 
 class EnrollmentViewSet(viewsets.ModelViewSet):
     """CRUD de inscripciones. Los estudiantes se inscriben a cursos."""
+
     queryset = Enrollment.objects.all()
     filterset_class = EnrollmentFilter
-    ordering_fields = ['enrolled_at']
+    ordering_fields = ["enrolled_at"]
 
     def get_serializer_class(self):
-        if self.action in ('create',):
+        if self.action in ("create",):
             return EnrollmentWriteSerializer
         return EnrollmentSerializer
 
     def get_permissions(self):
-        if self.action in ('list',):
+        if self.action in ("list",):
             return [IsAdminUser()]
-        if self.action in ('retrieve', 'update', 'partial_update'):
+        if self.action in ("retrieve", "update", "partial_update"):
             return [IsAuthenticated(), IsEnrolledOrAdmin()]
         return [IsAuthenticated()]
 

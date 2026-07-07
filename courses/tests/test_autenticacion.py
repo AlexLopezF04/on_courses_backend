@@ -11,37 +11,37 @@ class RegisterTests(TestCase):
 
     def setUp(self):
         self.client = unauth_client()
-        self.url = '/api/auth/register/'
+        self.url = "/api/auth/register/"
         self.data = {
-            'username': 'john',
-            'email': 'john@test.com',
-            'password': 'Pass1234!',
-            'password_confirm': 'Pass1234!',
-            'first_name': 'John',
-            'last_name': 'Doe',
+            "username": "john",
+            "email": "john@test.com",
+            "password": "Pass1234!",
+            "password_confirm": "Pass1234!",
+            "first_name": "John",
+            "last_name": "Doe",
         }
 
     def test_register_success(self):
         resp = self.client.post(self.url, self.data)
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(resp.data['username'], 'john')
-        self.assertEqual(resp.data['role'], 'student')
+        self.assertEqual(resp.data["username"], "john")
+        self.assertEqual(resp.data["role"], "student")
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn('Bienvenido', mail.outbox[0].subject)
-        self.assertEqual(mail.outbox[0].to, ['john@test.com'])
+        self.assertIn("Bienvenido", mail.outbox[0].subject)
+        self.assertEqual(mail.outbox[0].to, ["john@test.com"])
 
     def test_register_passwords_do_not_match(self):
-        self.data['password_confirm'] = 'Different!'
+        self.data["password_confirm"] = "Different!"
         resp = self.client.post(self.url, self.data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_register_duplicate_username(self):
-        create_user('john')
+        create_user("john")
         resp = self.client.post(self.url, self.data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_register_short_password(self):
-        self.data['password'] = self.data['password_confirm'] = '123'
+        self.data["password"] = self.data["password_confirm"] = "123"
         resp = self.client.post(self.url, self.data)
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -51,20 +51,16 @@ class LoginTests(TestCase):
 
     def setUp(self):
         self.client = unauth_client()
-        self.user = create_user('ana', password='Pass1234!')
+        self.user = create_user("ana", password="Pass1234!")
 
     def test_login_success(self):
-        resp = self.client.post('/api/auth/login/', {
-            'username': 'ana', 'password': 'Pass1234!'
-        })
+        resp = self.client.post("/api/auth/login/", {"username": "ana", "password": "Pass1234!"})
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn('access', resp.data)
-        self.assertIn('refresh', resp.data)
+        self.assertIn("access", resp.data)
+        self.assertIn("refresh", resp.data)
 
     def test_login_invalid_credentials(self):
-        resp = self.client.post('/api/auth/login/', {
-            'username': 'ana', 'password': 'wrong'
-        })
+        resp = self.client.post("/api/auth/login/", {"username": "ana", "password": "wrong"})
         self.assertEqual(resp.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
@@ -73,10 +69,10 @@ class RefreshTests(TestCase):
 
     def setUp(self):
         self.client = unauth_client()
-        user = create_user('bob')
+        user = create_user("bob")
         self.access, self.refresh = get_tokens(user)
 
     def test_refresh_returns_new_access(self):
-        resp = self.client.post('/api/auth/refresh/', {'refresh': self.refresh})
+        resp = self.client.post("/api/auth/refresh/", {"refresh": self.refresh})
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-        self.assertIn('access', resp.data)
+        self.assertIn("access", resp.data)

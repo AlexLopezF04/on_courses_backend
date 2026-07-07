@@ -6,21 +6,22 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from email_helper import send_welcome_email
 from courses.models import User
 from courses.serializers import RegisterSerializer, UserSerializer
+from email_helper import send_welcome_email
 
 
 @extend_schema(request=None, responses={200: None})
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([AllowAny])
 def health_check(request):
     """Verifica que el servidor esté operativo."""
-    return Response({'status': 'ok', 'version': '1.0'})
+    return Response({"status": "ok", "version": "1.0"})
 
 
 class RegisterView(generics.CreateAPIView):
     """Registro público de nuevos usuarios (rol 'student' por defecto)."""
+
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
@@ -30,14 +31,12 @@ class RegisterView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         send_welcome_email(user)
-        return Response(
-            UserSerializer(user).data,
-            status=status.HTTP_201_CREATED
-        )
+        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
 class LogoutView(APIView):
     """Cierra sesión e invalida el token refresh."""
+
     permission_classes = [IsAuthenticated]
 
     def post(self, request):

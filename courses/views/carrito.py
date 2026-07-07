@@ -5,25 +5,26 @@ from rest_framework.response import Response
 
 from courses.models import Cart, CartItem
 from courses.permissions import IsAdminUser
-from courses.serializers import CartSerializer, CartItemSerializer, CartItemWriteSerializer
+from courses.serializers import CartItemSerializer, CartItemWriteSerializer, CartSerializer
 
 
 class CartViewSet(viewsets.ModelViewSet):
     """Carrito de compras. Un carrito por usuario."""
+
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
 
     def get_permissions(self):
-        if self.action in ('list',):
+        if self.action in ("list",):
             return [IsAdminUser()]
         return [IsAuthenticated()]
 
     def get_queryset(self):
-        if self.request.user.role == 'admin':
+        if self.request.user.role == "admin":
             return Cart.objects.all()
         return Cart.objects.filter(user=self.request.user)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=["get"])
     def mine(self, request):
         """Obtiene o crea el carrito del usuario autenticado."""
         cart, _ = Cart.objects.get_or_create(user=request.user)
@@ -33,11 +34,12 @@ class CartViewSet(viewsets.ModelViewSet):
 
 class CartItemViewSet(viewsets.ModelViewSet):
     """Ítems del carrito. Agregar/remover cursos."""
+
     queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
 
     def get_serializer_class(self):
-        if self.action in ('create',):
+        if self.action in ("create",):
             return CartItemWriteSerializer
         return CartItemSerializer
 

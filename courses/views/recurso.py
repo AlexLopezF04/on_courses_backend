@@ -8,10 +8,11 @@ from courses.serializers import ResourceSerializer
 
 class ResourceViewSet(viewsets.ModelViewSet):
     """CRUD de recursos descargables."""
+
     queryset = Resource.objects.all()
     serializer_class = ResourceSerializer
 
     def get_permissions(self):
-        if self.action in ('list', 'retrieve'):
+        if self.action in ("list", "retrieve"):
             return [AllowAny()]
         return [IsAuthenticated(), IsProfessorOrAdminForWrite(), IsProfessorOwner()]

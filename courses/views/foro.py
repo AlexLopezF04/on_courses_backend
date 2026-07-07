@@ -14,20 +14,21 @@ from courses.serializers import (
 
 class ForumThreadViewSet(viewsets.ModelViewSet):
     """CRUD de hilos de foro por curso."""
+
     queryset = ForumThread.objects.all()
     filterset_class = ForumThreadFilter
-    search_fields = ['title', 'content']
-    ordering_fields = ['created_at']
+    search_fields = ["title", "content"]
+    ordering_fields = ["created_at"]
 
     def get_serializer_class(self):
-        if self.action == 'retrieve':
+        if self.action == "retrieve":
             return ForumThreadDetailSerializer
-        if self.action in ('create', 'update', 'partial_update'):
+        if self.action in ("create", "update", "partial_update"):
             return ForumThreadWriteSerializer
         return ForumThreadSerializer
 
     def get_permissions(self):
-        if self.action in ('list', 'retrieve'):
+        if self.action in ("list", "retrieve"):
             return [AllowAny()]
         return [IsAuthenticated()]
 
@@ -37,17 +38,18 @@ class ForumThreadViewSet(viewsets.ModelViewSet):
 
 class ForumPostViewSet(viewsets.ModelViewSet):
     """CRUD de mensajes dentro de un hilo."""
+
     queryset = ForumPost.objects.all()
     serializer_class = ForumPostSerializer
-    ordering_fields = ['created_at']
+    ordering_fields = ["created_at"]
 
     def get_serializer_class(self):
-        if self.action in ('create', 'update', 'partial_update'):
+        if self.action in ("create", "update", "partial_update"):
             return ForumPostWriteSerializer
         return ForumPostSerializer
 
     def get_permissions(self):
-        if self.action in ('list', 'retrieve'):
+        if self.action in ("list", "retrieve"):
             return [AllowAny()]
         return [IsAuthenticated()]
 
