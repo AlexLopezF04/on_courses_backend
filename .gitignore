@@ -11,3 +11,5 @@ staticfiles/
 guia_estudio.md
 guia_postman.md 
 .ruff_cache 
+repomix-output.md
+repomix-output.xml
